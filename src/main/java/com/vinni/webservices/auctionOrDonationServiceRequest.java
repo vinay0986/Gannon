@@ -8,7 +8,7 @@ public class auctionOrDonationServiceRequest {
 	private String productDescription;
 	private String auctionOrDonation;
 	private String closeDate;
-	private String userId;
+	private int userId;
 	private List<String> imagesList = new ArrayList<String>(0);
 	private float auctionAmount;
 
@@ -44,11 +44,11 @@ public class auctionOrDonationServiceRequest {
 		this.closeDate = closeDate;
 	}
 
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 

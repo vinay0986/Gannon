@@ -20,7 +20,7 @@ public class AuctionTransactionHistory implements Serializable {
 	private int auctionTransactionHistoryId;
 
 	@Column(name = "auction_amount")
-	private String auctionAmount;
+	private float auctionAmount;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "auction_price_change_date")
@@ -47,11 +47,11 @@ public class AuctionTransactionHistory implements Serializable {
 		this.auctionTransactionHistoryId = auctionTransactionHistoryId;
 	}
 
-	public String getAuctionAmount() {
+	public float getAuctionAmount() {
 		return this.auctionAmount;
 	}
 
-	public void setAuctionAmount(String auctionAmount) {
+	public void setAuctionAmount(float auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 
