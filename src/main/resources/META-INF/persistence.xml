@@ -7,13 +7,13 @@
 		transaction-type="RESOURCE_LOCAL">
 
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<class>com.vinni.entity.ConstantSettings</class>
-		<class>com.vinni.entity.Users</class>
-		<class>com.vinni.entity.AuctionTransaction</class>
-		<class>com.vinni.entity.AuctionTransactionHistory</class>
-		<class>com.vinni.entity.DonationTransaction</class>
-		<class>com.vinni.entity.ProductImage</class>
-		<class>com.vinni.entity.AuctionDonationFavouriteHistory</class>
+		<class>com.gannon.entity.ConstantSettings</class>
+		<class>com.gannon.entity.Users</class>
+		<class>com.gannon.entity.AuctionTransaction</class>
+		<class>com.gannon.entity.AuctionTransactionHistory</class>
+		<class>com.gannon.entity.DonationTransaction</class>
+		<class>com.gannon.entity.ProductImage</class>
+		<class>com.gannon.entity.AuctionDonationFavouriteHistory</class>
 		<properties>
 
 			<property name="hibernate.connection.url"

@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.vinni</groupId>
+	<groupId>com.gannon</groupId>
 	<artifactId>Gannon</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
@@ -11,6 +11,16 @@
 		<resteasy.version>3.15.3.Final</resteasy.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
@@ -24,31 +34,13 @@
 			<version>4.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		 <!-- Faces Implementation -->
-		<!--<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-impl</artifactId>
-			<version>2.2.4</version>
-		</dependency>
-		Faces Library
-		<dependency>
-			<groupId>com.sun.faces</groupId>
-			<artifactId>jsf-api</artifactId>
-			<version>2.2.4</version>
-		</dependency>
-
-		JSP Library
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>javax.servlet.jsp-api</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		JSTL Library
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.1.2</version>
-		</dependency> -->
+		<!-- Faces Implementation -->
+		<!--<dependency> <groupId>com.sun.faces</groupId> <artifactId>jsf-impl</artifactId> 
+			<version>2.2.4</version> </dependency> Faces Library <dependency> <groupId>com.sun.faces</groupId> 
+			<artifactId>jsf-api</artifactId> <version>2.2.4</version> </dependency> JSP 
+			Library <dependency> <groupId>javax.servlet.jsp</groupId> <artifactId>javax.servlet.jsp-api</artifactId> 
+			<version>2.3.1</version> </dependency> JSTL Library <dependency> <groupId>javax.servlet</groupId> 
+			<artifactId>jstl</artifactId> <version>1.1.2</version> </dependency> -->
 
 		<dependency>
 			<groupId>mysql</groupId>
