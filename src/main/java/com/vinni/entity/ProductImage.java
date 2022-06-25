@@ -27,12 +27,12 @@ public class ProductImage implements Serializable {
 	private Date uploadedDate;
 
 	// bi-directional many-to-one association to AuctionTransaction
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "auction_trasaction_id")
 	private AuctionTransaction auctionTransaction;
 
 	// bi-directional many-to-one association to DonationTransaction
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "donation_transaction_id")
 	private DonationTransaction donationTransaction;
 

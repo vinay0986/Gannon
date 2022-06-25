@@ -34,7 +34,7 @@ public class ForgotPasswordService {
                 return Response.ok(pojo).build();
             } catch (Exception e) {
                 ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-                pojo2.setMessage("Provided Email was not registered/Invalid");
+                pojo2.setError("Provided Email was not registered/Invalid");
                 pojo2.setStatus("failure");
                 pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
                 return Response.ok(pojo2).build();
@@ -42,7 +42,7 @@ public class ForgotPasswordService {
         } catch (Exception e2) {
             e2.printStackTrace();
             ErrorMessagePojo pojo3 = new ErrorMessagePojo();
-            pojo3.setMessage("Unable to send the mail or something went wrong");
+            pojo3.setError("Unable to send the mail or something went wrong");
             pojo3.setStatus("failure");
             pojo3.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             return Response.ok(pojo3).build();

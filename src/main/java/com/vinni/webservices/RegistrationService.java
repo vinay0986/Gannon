@@ -24,7 +24,7 @@ public class RegistrationService {
 			if (!em.createQuery("from Users where email=:em").setParameter("em", input.getEmail()).getResultList()
 					.isEmpty()) {
 				ErrorMessagePojo pojo = new ErrorMessagePojo();
-				pojo.setMessage("Provided Email is already registred");
+				pojo.setError("Provided Email is already registred");
 				pojo.setStatus("failure");
 				pojo.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 				return Response.ok(pojo).build();
@@ -59,7 +59,7 @@ public class RegistrationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			ErrorMessagePojo pojo3 = new ErrorMessagePojo();
-			pojo3.setMessage("Unable to send the mail or something went wrong");
+			pojo3.setError("Unable to send the mail or something went wrong");
 			pojo3.setStatus("failure");
 			pojo3.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo3).build();

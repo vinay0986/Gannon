@@ -1,7 +1,7 @@
 package com.vinni.webservices;
 
 public class ErrorMessagePojo {
-    private String message;
+    private String error;
     private String status;
     private int statusCode;
 
@@ -21,11 +21,13 @@ public class ErrorMessagePojo {
         this.status = status2;
     }
 
-    public String getMessage() {
-        return this.message;
-    }
+	public String getError() {
+		return error;
+	}
 
-    public void setMessage(String message2) {
-        this.message = message2;
-    }
+	public void setError(String error) {
+		this.error = error;
+	}
+
+   
 }

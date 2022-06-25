@@ -38,12 +38,23 @@ public class AllAuctionDonationsService {
 			List<AllAuctionDOnationListServiceRes> results = new ArrayList<AllAuctionDOnationListServiceRes>(0);
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
-				List<AuctionTransaction> list = em.createNativeQuery(
-						"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby  "
-								+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
-						AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
-						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-						.getResultList();
+				List<AuctionTransaction> list = new ArrayList<>(0);
+				if (input.getSearchString() == null) {
+					list = em.createNativeQuery(
+							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby  "
+									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
+							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
+							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
+							.getResultList();
+				} else {
+					list = em.createNativeQuery(
+							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby and product_name like '%"
+									+ input.getSearchString() + "%'"
+									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
+							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
+							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
+							.getResultList();
+				}
 
 				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -73,11 +84,22 @@ public class AllAuctionDonationsService {
 					results.add(res);
 				}
 			} else {
-				List<DonationTransaction> list = em.createNativeQuery(
-						"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb order by donation_close_date desc LIMIT :lim OFFSET :offset",
-						DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
-						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-						.getResultList();
+				List<DonationTransaction> list = new ArrayList<>(0);
+				if (input.getSearchString() == null) {
+					list = em.createNativeQuery(
+							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb order by donation_close_date desc LIMIT :lim OFFSET :offset",
+							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
+							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
+							.getResultList();
+				} else {
+					list = em.createNativeQuery(
+							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and product_name like '%"
+							+ input.getSearchString() + "%'"
+							+ " order by donation_close_date desc LIMIT :lim OFFSET :offset",
+							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
+							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
+							.getResultList();
+				}
 
 				List<Integer> ids = list.stream().map(it -> it.getDonationTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -111,10 +133,12 @@ public class AllAuctionDonationsService {
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
 			pojo.setStatus("Success");
 			return Response.ok((Object) pojo).build();
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -154,7 +178,7 @@ public class AllAuctionDonationsService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -227,7 +251,7 @@ public class AllAuctionDonationsService {
 		Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();

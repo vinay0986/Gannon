@@ -32,7 +32,7 @@ public class LoginService {
         } catch (Exception e) {
             e.printStackTrace();
             ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-            pojo2.setMessage("Invalid UserName/Password");
+            pojo2.setError("Invalid UserName/Password");
             pojo2.setStatus("failure");
             pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             return Response.ok(pojo2).build();

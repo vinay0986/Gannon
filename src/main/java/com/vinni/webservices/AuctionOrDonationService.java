@@ -106,7 +106,7 @@ public class AuctionOrDonationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -149,7 +149,7 @@ public class AuctionOrDonationService {
 			ErrorMessagePojo error = new ErrorMessagePojo();
 			error.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			error.setStatus("Failure");
-			error.setMessage("Unable Process your request");
+			error.setError("Unable Process your request");
 			return Response.ok(error).build();
 		}
 	}
@@ -287,7 +287,7 @@ public class AuctionOrDonationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -324,7 +324,7 @@ public class AuctionOrDonationService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -390,7 +390,7 @@ public class AuctionOrDonationService {
 		Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -455,7 +455,7 @@ public class AuctionOrDonationService {
 		Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
@@ -721,6 +721,15 @@ class AuctionOrDonationListServiceReq {
 	private String auctionOrDonation;
 	private int offset;
 	private int limit;
+	private String searchString;
+
+	public String getSearchString() {
+		return searchString;
+	}
+
+	public void setSearchString(String searchString) {
+		this.searchString = searchString;
+	}
 
 	public int getUserId() {
 		return userId;

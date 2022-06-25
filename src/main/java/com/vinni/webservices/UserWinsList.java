@@ -110,7 +110,7 @@ public class UserWinsList {
 		} catch (Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-			pojo2.setMessage("Unable to process the request");
+			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();

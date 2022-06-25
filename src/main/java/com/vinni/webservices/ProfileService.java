@@ -31,7 +31,7 @@ public class ProfileService {
         } catch (Exception e) {
             e.printStackTrace();
             ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-            pojo2.setMessage("something went wrong");
+            pojo2.setError("something went wrong");
             pojo2.setStatus("failure");
             pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             return Response.ok(pojo2).build();
@@ -62,7 +62,7 @@ public class ProfileService {
         } catch (Exception e) {
             e.printStackTrace();
             ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-            pojo2.setMessage("something went wrong");
+            pojo2.setError("something went wrong");
             pojo2.setStatus("failure");
             pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             return Response.ok(pojo2).build();

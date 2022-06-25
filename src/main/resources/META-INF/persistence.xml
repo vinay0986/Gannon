@@ -13,6 +13,7 @@
 		<class>com.vinni.entity.AuctionTransactionHistory</class>
 		<class>com.vinni.entity.DonationTransaction</class>
 		<class>com.vinni.entity.ProductImage</class>
+		<class>com.vinni.entity.AuctionDonationFavouriteHistory</class>
 		<properties>
 
 			<property name="hibernate.connection.url"
