@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +27,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 /*import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;*/
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -114,7 +118,6 @@ public class AuctionOrDonationService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response uploadFiles2(MultipartFormDataInput input) {
-		System.out.println("methid called---------------");
 		try {
 			Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 			List<InputPart> inputParts = uploadForm.get("files");
@@ -125,9 +128,16 @@ public class AuctionOrDonationService {
 				fileName = fileName.replace(fileName.substring(0, fileName.indexOf(".")),
 						String.valueOf(System.currentTimeMillis()));
 				fileNames.add(fileName);
-				InputStream inputStream = inputPart.getBody(InputStream.class, null);
-				byte[] bytes = IOUtils.toByteArray(inputStream);
-				saveFile(bytes, fileName);
+				InputStream inputStream = null;
+				try {
+					inputStream = inputPart.getBody(InputStream.class, null);
+					byte[] bytes = IOUtils.toByteArray(inputStream);
+					saveFile(bytes, fileName);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					inputStream.close();
+				}
 			}
 			SuccessMessagePojo success = new SuccessMessagePojo();
 			success.setStatusCode(Response.Status.OK.getStatusCode());
@@ -205,9 +215,8 @@ public class AuctionOrDonationService {
 								"select * from auction_transaction where auction_created_by=:usr "
 										+ " order by auction_transaction_id desc LIMIT :lim OFFSET :offset",
 								AuctionTransaction.class)
-						.setParameter("usr", input.getUserId())
-						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-						.getResultList();
+						.setParameter("usr", input.getUserId()).setParameter("lim", input.getLimit())
+						.setParameter("offset", input.getOffset()).getResultList();
 
 				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -240,9 +249,8 @@ public class AuctionOrDonationService {
 								"select * from donation_transaction where donation_created_by=:usr "
 										+ " order by donation_transaction_id desc LIMIT :lim OFFSET :offset",
 								DonationTransaction.class)
-						.setParameter("usr", input.getUserId())
-						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-						.getResultList();
+						.setParameter("usr", input.getUserId()).setParameter("lim", input.getLimit())
+						.setParameter("offset", input.getOffset()).getResultList();
 
 				List<Integer> ids = list.stream().map(it -> it.getDonationTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -296,12 +304,14 @@ public class AuctionOrDonationService {
 			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
-			List<AuctionDetailsHistoryRes> results=new ArrayList<>(0);
-			List<AuctionTransactionHistory> history=em.createQuery("from AuctionTransactionHistory where auctionTransaction.auctionTransactionId=:id "
-					+ "order by auctionTransactionHistoryId desc").setParameter("id", input.getAuctionId()).getResultList();
-			for(AuctionTransactionHistory his:history) {
-				AuctionDetailsHistoryRes res=new AuctionDetailsHistoryRes();
-				res.setAuctionUser(his.getAictionUser().getFirstName()+" "+his.getAictionUser().getLastName());
+			List<AuctionDetailsHistoryRes> results = new ArrayList<>(0);
+			List<AuctionTransactionHistory> history = em
+					.createQuery("from AuctionTransactionHistory where auctionTransaction.auctionTransactionId=:id "
+							+ "order by auctionTransactionHistoryId desc")
+					.setParameter("id", input.getAuctionId()).getResultList();
+			for (AuctionTransactionHistory his : history) {
+				AuctionDetailsHistoryRes res = new AuctionDetailsHistoryRes();
+				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + his.getAictionUser().getLastName());
 				res.setAuctionAmount(his.getAuctionAmount());
 				res.setAuctionDate(sdf.format(his.getAuctionPriceChangeDate()));
 				results.add(res);
@@ -357,7 +367,7 @@ public class AuctionOrDonationService {
 				List<ProductImage> imgList = em
 						.createQuery("from ProductImage where donationTransaction is not null "
 								+ "and donationTransaction.donationTransactionId =:ids order by productImageId asc")
-						.setParameter("ids", input.getAuctionId()).getResultList();
+						.setParameter("ids", input.getDonationId()).getResultList();
 
 				res.setProductName(at.getProductName());
 				res.setAuctionCloseDate(sdf.format(at.getDonationCloseDate()));

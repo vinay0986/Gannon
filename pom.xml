@@ -8,7 +8,7 @@
 	<packaging>war</packaging>
 	<name>Gannon Auction Shop</name>
 	<properties>
-		<resteasy.version>3.0.18.Final</resteasy.version>
+		<resteasy.version>3.15.3.Final</resteasy.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -24,31 +24,31 @@
 			<version>4.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Faces Implementation -->
-		<dependency>
+		 <!-- Faces Implementation -->
+		<!--<dependency>
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-impl</artifactId>
 			<version>2.2.4</version>
 		</dependency>
-		<!-- Faces Library -->
+		Faces Library
 		<dependency>
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-api</artifactId>
 			<version>2.2.4</version>
 		</dependency>
 
-		<!-- JSP Library -->
+		JSP Library
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>javax.servlet.jsp-api</artifactId>
 			<version>2.3.1</version>
 		</dependency>
-		<!-- JSTL Library -->
+		JSTL Library
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.1.2</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>mysql</groupId>

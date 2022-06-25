@@ -87,8 +87,8 @@ public class AllAuctionDonationsService {
 									+ "and donationTransaction.donationTransactionId IN (:ids) order by productImageId asc")
 							.setParameter("ids", ids).getResultList();
 					for (ProductImage img : imgList) {
-						if (!imgMap.containsKey(img.getAuctionTransaction().getAuctionTransactionId()))
-							imgMap.put(img.getAuctionTransaction().getAuctionTransactionId(), img.getImagePath());
+						if (!imgMap.containsKey(img.getDonationTransaction().getDonationTransactionId()))
+							imgMap.put(img.getDonationTransaction().getDonationTransactionId(), img.getImagePath());
 					}
 				}
 				for (DonationTransaction at : list) {
@@ -197,12 +197,12 @@ public class AllAuctionDonationsService {
 				res.setImagesList(images);
 			} else {
 				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
-				Users user = em.find(Users.class, at.getDonationCreatedBy());
+				Users user = at.getDonationCreatedBy();
 
 				List<ProductImage> imgList = em
 						.createQuery("from ProductImage where donationTransaction is not null "
 								+ "and donationTransaction.donationTransactionId =:ids order by productImageId asc")
-						.setParameter("ids", input.getAuctionId()).getResultList();
+						.setParameter("ids", input.getDonationId()).getResultList();
 
 				res.setProductName(at.getProductName());
 				res.setAuctionCloseDate(sdf.format(at.getDonationCloseDate()));
