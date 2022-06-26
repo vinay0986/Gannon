@@ -24,20 +24,22 @@ public class ForgotPasswordService {
 				Users users = (Users) em.createQuery("from Users where email=:e and fActive='Y'")
 						.setParameter("e", input.getEmail()).getSingleResult();
 				StringBuilder sb = new StringBuilder();
-				sb.append("Dear " + users.getFirstName() + ",\n\n");
-				sb.append("Your password is :" + users.getPassWord());
-				sb.append("\n\n\tNOTE:This is a system-generated e-mail, Please don't reply to this message");
-				new EmailSend().emailSend(em, "Password Details", sb.toString(), users.getEmail());
+				sb.append("Dear " + users.getFirstName()+" "+users.getLastName() + ",\n");
+				sb.append("Thank you for contacting Gannon Auction Shop support. Please find your password details.\n");
+				sb.append("Password:" + users.getPassWord()+"\n");
+				sb.append("Please do not share your login ID or password to anyone.\n");
+				sb.append("\n\tNOTE: This is a system generated email. Please do not reply.");
+				new EmailSend().emailSend(em, "Gannon Auction Shop – Forgot Password Request.", sb.toString(), users.getEmail());
 				em.getTransaction().commit();
 				PersistenceManager.closeEntityManagerFactory();
 				SuccessMessagePojo pojo = new SuccessMessagePojo();
-				pojo.setMessage("Password successfully sent to your registered email");
+				pojo.setMessage("Password successfully sent to registered email.");
 				pojo.setStatusCode(Response.Status.OK.getStatusCode());
 				pojo.setStatus("Success");
 				return Response.ok(pojo).build();
 			} catch (Exception e) {
 				ErrorMessagePojo pojo2 = new ErrorMessagePojo();
-				pojo2.setError("Provided Email was not registered/Invalid");
+				pojo2.setError("Email ID not found! Contact Gannon IT Support.");
 				pojo2.setStatus("failure");
 				pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 				return Response.ok(pojo2).build();

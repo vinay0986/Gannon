@@ -39,16 +39,20 @@ public class RegistrationService {
 			reg.setStudentId(input.getStudentId());
 			em.persist(reg);
 			StringBuilder sb = new StringBuilder();
-			sb.append("Dear Admin\n\n");
+			sb.append("Dear Admin\n");
+			sb.append(reg.getFirstName() + " " + reg.getLastName()
+					+ ", has requested you to Activate his/her account in Gannon Auction Shop."
+					+ "Please verify below details and for approving or denying user, please login to Gannon Auction Shop mobile app.");
 			sb.append(
-					"\n\n<html><table border='2'><tr><td style='text-align:center;'>Student Id</td><td style='text-align:center;'>Email</td><td style='text-align:center;'>First Name</td><td style='text-align:center;'>Last Name</td><td style='text-align:center;'>Phone Number</td></tr><tr><td style='text-align:center;'>"
+					"\n <html><table border='2'><tr><td style='text-align:center;'>Student Id</td><td style='text-align:center;'>Email</td><td style='text-align:center;'>First Name</td><td style='text-align:center;'>Last Name</td><td style='text-align:center;'>Phone Number</td></tr><tr><td style='text-align:center;'>"
 							+ reg.getStudentId() + "</td><td style='text-align:center;'>" + reg.getEmail()
 							+ "</td><td style='text-align:center;'>" + reg.getFirstName()
 							+ "</td><td style='text-align:center;'>" + reg.getLastName()
 							+ "</td><td style='text-align:center;'>" + reg.getPhoneNumber()
 							+ "</td></tr></table></html>");
-			sb.append("\n\n\tNOTE:This is a system-generated e-mail, Please don't reply to this message");
-			new EmailSend().emailSend(em, "New Registration Details", sb.toString(),
+			sb.append("\n Thank you.");
+			sb.append("\n NOTE: This is a system generated email. Please do not reply.");
+			new EmailSend().emailSend(em, "Gannon Auction Shop – User Activation Request.", sb.toString(),
 					((Users) em.createQuery("from Users where fAdmin=1").getSingleResult()).getEmail());
 			em.getTransaction().commit();
 			PersistenceManager.closeEntityManagerFactory();
@@ -67,5 +71,4 @@ public class RegistrationService {
 		}
 	}
 
-	
 }
