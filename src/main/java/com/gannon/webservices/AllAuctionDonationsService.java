@@ -94,8 +94,8 @@ public class AllAuctionDonationsService {
 				} else {
 					list = em.createNativeQuery(
 							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and product_name like '%"
-							+ input.getSearchString() + "%'"
-							+ " order by donation_close_date desc LIMIT :lim OFFSET :offset",
+									+ input.getSearchString() + "%'"
+									+ " order by donation_close_date desc LIMIT :lim OFFSET :offset",
 							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
 							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
 							.getResultList();
@@ -212,7 +212,7 @@ public class AllAuctionDonationsService {
 				res.setAuctionAmount(at.getAuctionAmount());
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setProductDescription(at.getProductDescription());
-				res.setSellerEMail(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
+				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
 				res.setSellerEMail(user.getEmail());
 				res.setSellerPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
 
