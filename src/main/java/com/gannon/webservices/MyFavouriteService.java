@@ -158,7 +158,7 @@ public class MyFavouriteService {
 				for (DonationTransaction at : list) {
 					AllAuctionDOnationListServiceRes res = new AllAuctionDOnationListServiceRes();
 					res.setProductName(at.getProductName());
-					res.setAuctionId(at.getDonationTransactionId());
+					res.setDonationId(at.getDonationTransactionId());
 					res.setClosingDate(sdf.format(at.getDonationCloseDate()));
 					if (!imgMap.isEmpty()) {
 						if (imgMap.containsKey(at.getDonationTransactionId())) {
