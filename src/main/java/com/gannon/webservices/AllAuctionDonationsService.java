@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import com.gannon.entity.AuctionDonationFavouriteHistory;
 import com.gannon.entity.AuctionTransaction;
 import com.gannon.entity.AuctionTransactionHistory;
 import com.gannon.entity.DonationTransaction;
@@ -41,15 +42,17 @@ public class AllAuctionDonationsService {
 				List<AuctionTransaction> list = new ArrayList<>(0);
 				if (input.getSearchString() == null) {
 					list = em.createNativeQuery(
-							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby  "
+							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby and "
+									+ "auction_created_by IN (select user_id from users where f_active='Y') "
 									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
 							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
 							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
 							.getResultList();
 				} else {
 					list = em.createNativeQuery(
-							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby and product_name like '%"
-									+ input.getSearchString() + "%'"
+							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby "
+									+ " and auction_created_by IN (select user_id from users where f_active='Y') "
+									+ " and product_name like '%" + input.getSearchString() + "%'"
 									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
 							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
 							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
@@ -58,6 +61,7 @@ public class AllAuctionDonationsService {
 
 				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
+				Map<Integer, Boolean> favMap = new HashMap<>(0);
 				if (!ids.isEmpty()) {
 					List<ProductImage> imgList = em
 							.createQuery("from ProductImage where auctionTransaction is not null "
@@ -66,6 +70,17 @@ public class AllAuctionDonationsService {
 					for (ProductImage img : imgList) {
 						if (!imgMap.containsKey(img.getAuctionTransaction().getAuctionTransactionId()))
 							imgMap.put(img.getAuctionTransaction().getAuctionTransactionId(), img.getImagePath());
+					}
+
+					List<AuctionDonationFavouriteHistory> favList = em
+							.createQuery("from AuctionDonationFavouriteHistory where auctionTransaction is not null "
+									+ " and auctionTransaction.auctionTransactionId IN (:ids) and users.userId=:uid order by auctionDonationFavouriteHistoryId desc")
+							.setParameter("uid", input.getUserId()).setParameter("ids", ids).getResultList();
+
+					for (AuctionDonationFavouriteHistory his : favList) {
+						if (!favMap.containsKey(his.getAuctionTransaction().getAuctionTransactionId())) {
+							favMap.put(his.getAuctionTransaction().getAuctionTransactionId(), true);
+						}
 					}
 
 				}
@@ -81,20 +96,28 @@ public class AllAuctionDonationsService {
 							res.setImageUrl("img/" + imgMap.get(at.getAuctionTransactionId()));
 						}
 					}
+					if (!favMap.isEmpty()) {
+						if (favMap.containsKey(at.getAuctionTransactionId())) {
+							res.setFavouriteCheck(true);
+						}
+					}
+
 					results.add(res);
 				}
 			} else {
 				List<DonationTransaction> list = new ArrayList<>(0);
 				if (input.getSearchString() == null) {
 					list = em.createNativeQuery(
-							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb order by donation_close_date desc LIMIT :lim OFFSET :offset",
+							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb"
+									+ " and donation_created_by IN (select user_id from users where f_active='Y') order by donation_close_date desc LIMIT :lim OFFSET :offset",
 							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
 							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
 							.getResultList();
 				} else {
 					list = em.createNativeQuery(
-							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and product_name like '%"
-									+ input.getSearchString() + "%'"
+							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and "
+									+ " donation_created_by IN (select user_id from users where f_active='Y') "
+									+ " and product_name like '%" + input.getSearchString() + "%'"
 									+ " order by donation_close_date desc LIMIT :lim OFFSET :offset",
 							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
 							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
@@ -103,6 +126,7 @@ public class AllAuctionDonationsService {
 
 				List<Integer> ids = list.stream().map(it -> it.getDonationTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
+				Map<Integer, Boolean> favMap = new HashMap<>(0);
 				if (!ids.isEmpty()) {
 					List<ProductImage> imgList = em
 							.createQuery("from ProductImage where donationTransaction is not null "
@@ -111,6 +135,17 @@ public class AllAuctionDonationsService {
 					for (ProductImage img : imgList) {
 						if (!imgMap.containsKey(img.getDonationTransaction().getDonationTransactionId()))
 							imgMap.put(img.getDonationTransaction().getDonationTransactionId(), img.getImagePath());
+					}
+
+					List<AuctionDonationFavouriteHistory> favList = em
+							.createQuery("from AuctionDonationFavouriteHistory where donationTransaction is not null "
+									+ " and donationTransaction.donationTransactionId IN (:ids) and users.userId=:uid order by auctionDonationFavouriteHistoryId desc")
+							.setParameter("uid", input.getUserId()).setParameter("ids", ids).getResultList();
+
+					for (AuctionDonationFavouriteHistory his : favList) {
+						if (!favMap.containsKey(his.getDonationTransaction().getDonationTransactionId())) {
+							favMap.put(his.getDonationTransaction().getDonationTransactionId(), true);
+						}
 					}
 				}
 				for (DonationTransaction at : list) {
@@ -121,6 +156,11 @@ public class AllAuctionDonationsService {
 					if (!imgMap.isEmpty()) {
 						if (imgMap.containsKey(at.getDonationTransactionId())) {
 							res.setImageUrl("img/" + imgMap.get(at.getDonationTransactionId()));
+						}
+					}
+					if (!favMap.isEmpty()) {
+						if (favMap.containsKey(at.getDonationTransactionId())) {
+							res.setFavouriteCheck(true);
 						}
 					}
 					results.add(res);
@@ -156,8 +196,24 @@ public class AllAuctionDonationsService {
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Users user = em.find(Users.class, input.getUserId());
+
+			if (user.isfAdmin()) {
+				ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+				pojo2.setError("No permission to admin to sell the products");
+				pojo2.setStatus("failure");
+				pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+				return Response.ok((Object) pojo2).build();
+			}
+
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
+			if (input.getAuctionAmount() < at.getAuctionAmount()) {
+				ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+				pojo2.setError("Auction amount should be greather than the current auction amount");
+				pojo2.setStatus("failure");
+				pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+				return Response.ok((Object) pojo2).build();
+			}
 			at.setAuctionAmount(input.getAuctionAmount());
 			at.setAuctionPriceChangeDate(new Date());
 			at.setLatestAuctionUser(user);
@@ -378,6 +434,15 @@ class AllAuctionDOnationListServiceRes {
 	private int donationId;
 	private float auctionAmount;
 	private String closingDate;
+	private boolean favouriteCheck;
+
+	public boolean isFavouriteCheck() {
+		return favouriteCheck;
+	}
+
+	public void setFavouriteCheck(boolean favouriteCheck) {
+		this.favouriteCheck = favouriteCheck;
+	}
 
 	public float getAuctionAmount() {
 		return auctionAmount;

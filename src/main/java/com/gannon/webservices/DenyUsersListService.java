@@ -44,7 +44,7 @@ public class DenyUsersListService {
 				p.setLastName(reg.getLastName());
 				p.setPhoneNumber(reg.getPhoneNumber());
 				p.setRegistrationId(reg.getUserId().intValue());
-				p.setStatus(reg.getfActive().equalsIgnoreCase("Y") ? "activated" : "Deactivated");
+				p.setStatus(reg.getfActive().equalsIgnoreCase("Y") ? "Activated" : "Deactivated");
 				p.setStudentId(reg.getStudentId());
 				pojoList.add(p);
 			}
