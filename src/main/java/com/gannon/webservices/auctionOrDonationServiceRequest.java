@@ -10,7 +10,7 @@ public class auctionOrDonationServiceRequest {
 	private String closeDate;
 	private int userId;
 	private List<String> imagesList = new ArrayList<String>(0);
-	private float auctionAmount;
+	private int auctionAmount;
 
 	public String getProductName() {
 		return productName;
@@ -60,11 +60,11 @@ public class auctionOrDonationServiceRequest {
 		this.imagesList = imagesList;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 

@@ -314,7 +314,7 @@ public class AuctionOrDonationService {
 			for (AuctionTransactionHistory his : history) {
 				AuctionDetailsHistoryRes res = new AuctionDetailsHistoryRes();
 				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + his.getAictionUser().getLastName());
-				res.setAuctionAmount(his.getAuctionAmount());
+				res.setAuctionAmount((int)his.getAuctionAmount());
 				res.setAuctionDate(sdf.format(his.getAuctionPriceChangeDate()));
 				results.add(res);
 			}
@@ -355,10 +355,10 @@ public class AuctionOrDonationService {
 						.setParameter("ids", input.getAuctionId()).getResultList();
 
 				res.setProductName(at.getProductName());
-				res.setAuctionAmount(at.getAuctionAmount());
+				res.setAuctionAmount((int)at.getAuctionAmount());
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setAuctionStatus(at.getAuctionStatus());
-				res.setInitialAmount(at.getInitialAuctionAmount());
+				res.setInitialAmount((int)at.getInitialAuctionAmount());
 				res.setProductDescription(at.getProductDescription());
 				List<String> images = new ArrayList<>(0);
 				for (ProductImage img : imgList) {
@@ -472,7 +472,7 @@ public class AuctionOrDonationService {
 class AuctionDetailsHistoryRes {
 	private String auctionUser;
 	private String auctionDate;
-	private float auctionAmount;
+	private int auctionAmount;
 
 	public String getAuctionUser() {
 		return auctionUser;
@@ -490,11 +490,11 @@ class AuctionDetailsHistoryRes {
 		this.auctionDate = auctionDate;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 
@@ -581,15 +581,15 @@ class AuctionDonationDetailsResponse {
 	private String productDescription;
 	private String auctionCloseDate;
 	private String auctionStatus;
-	private float auctionAmount;
-	private float initialAmount;
+	private int auctionAmount;
+	private int initialAmount;
 	private List<String> imagesList = new ArrayList<>(0);
 
-	public float getInitialAmount() {
+	public int getInitialAmount() {
 		return initialAmount;
 	}
 
-	public void setInitialAmount(float initialAmount) {
+	public void setInitialAmount(int initialAmount) {
 		this.initialAmount = initialAmount;
 	}
 
@@ -633,11 +633,11 @@ class AuctionDonationDetailsResponse {
 		this.auctionStatus = auctionStatus;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 

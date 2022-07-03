@@ -90,7 +90,7 @@ public class AllAuctionDonationsService {
 					res.setProductName(at.getProductName());
 					res.setAuctionId(at.getAuctionTransactionId());
 					res.setClosingDate(sdf.format(at.getAuctionCloseDate()));
-					res.setAuctionAmount(at.getAuctionAmount());
+					res.setAuctionAmount((int) at.getAuctionAmount());
 					if (!imgMap.isEmpty()) {
 						if (imgMap.containsKey(at.getAuctionTransactionId())) {
 							res.setImageUrl("img/" + imgMap.get(at.getAuctionTransactionId()));
@@ -265,7 +265,7 @@ public class AllAuctionDonationsService {
 						.setParameter("ids", input.getAuctionId()).getResultList();
 
 				res.setProductName(at.getProductName());
-				res.setAuctionAmount(at.getAuctionAmount());
+				res.setAuctionAmount((int)at.getAuctionAmount());
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setProductDescription(at.getProductDescription());
 				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
@@ -323,7 +323,7 @@ class AllAuctionDonationDetailsResponse {
 	private String productName;
 	private String productDescription;
 	private String auctionCloseDate;
-	private float auctionAmount;
+	private int auctionAmount;
 	private List<String> imagesList = new ArrayList<>(0);
 	private String sellerName;
 	private String sellerEMail;
@@ -385,11 +385,11 @@ class AllAuctionDonationDetailsResponse {
 		this.auctionCloseDate = auctionCloseDate;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 
@@ -397,7 +397,7 @@ class AllAuctionDonationDetailsResponse {
 
 class AllAuctionAmountUpdateRequest {
 	private int auctionId;
-	private float auctionAmount;
+	private int auctionAmount;
 	private int userId;
 
 	public int getAuctionId() {
@@ -408,11 +408,11 @@ class AllAuctionAmountUpdateRequest {
 		this.auctionId = auctionId;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 
@@ -432,7 +432,7 @@ class AllAuctionDOnationListServiceRes {
 	private int totalCount;
 	private int auctionId;
 	private int donationId;
-	private float auctionAmount;
+	private int auctionAmount;
 	private String closingDate;
 	private boolean favouriteCheck;
 
@@ -444,11 +444,11 @@ class AllAuctionDOnationListServiceRes {
 		this.favouriteCheck = favouriteCheck;
 	}
 
-	public float getAuctionAmount() {
+	public int getAuctionAmount() {
 		return auctionAmount;
 	}
 
-	public void setAuctionAmount(float auctionAmount) {
+	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
 	}
 

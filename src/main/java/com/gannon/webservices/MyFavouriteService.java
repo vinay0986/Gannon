@@ -125,7 +125,7 @@ public class MyFavouriteService {
 					res.setProductName(at.getProductName());
 					res.setAuctionId(at.getAuctionTransactionId());
 					res.setClosingDate(sdf.format(at.getAuctionCloseDate()));
-					res.setAuctionAmount(at.getAuctionAmount());
+					res.setAuctionAmount((int)at.getAuctionAmount());
 					if (!imgMap.isEmpty()) {
 						if (imgMap.containsKey(at.getAuctionTransactionId())) {
 							res.setImageUrl("img/" + imgMap.get(at.getAuctionTransactionId()));
