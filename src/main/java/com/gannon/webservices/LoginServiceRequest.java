@@ -1,25 +1,34 @@
 package com.gannon.webservices;
 
 class LoginServiceRequest {
-    private String password;
-    private String userName;
+	private String password;
+	private String userName;
+	private String token;
 
-    LoginServiceRequest() {
-    }
+	public String getToken() {
+		return token;
+	}
 
-    public String getUserName() {
-        return this.userName;
-    }
+	public void setToken(String token) {
+		this.token = token;
+	}
 
-    public void setUserName(String userName2) {
-        this.userName = userName2;
-    }
+	LoginServiceRequest() {
+	}
 
-    public String getPassword() {
-        return this.password;
-    }
+	public String getUserName() {
+		return this.userName;
+	}
 
-    public void setPassword(String password2) {
-        this.password = password2;
-    }
+	public void setUserName(String userName2) {
+		this.userName = userName2;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setPassword(String password2) {
+		this.password = password2;
+	}
 }
