@@ -33,6 +33,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;*/
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import com.gannon.FirebaseMessaging.FirebseCloudMessagingClass;
 import com.gannon.entity.AuctionTransaction;
 import com.gannon.entity.AuctionTransactionHistory;
 import com.gannon.entity.DonationTransaction;
@@ -54,6 +55,7 @@ public class AuctionOrDonationService {
 			em.getTransaction().begin();
 			final Users reg = (Users) em.find(Users.class, (Object) input.getUserId());
 			String message = null;
+			String imgUrl = null;
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
 				AuctionTransaction au = new AuctionTransaction();
 				au.setAuctionAmount(input.getAuctionAmount());
@@ -74,7 +76,17 @@ public class AuctionOrDonationService {
 						img.setUploadedDate(new Date());
 						em.persist(img);
 					}
+					imgUrl = input.getImagesList().get(0);
 				}
+				// Notification Code
+				List<String> tokenList = em
+						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null")
+						.getResultList();
+				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+				fcm.sendPushNotificationToMultiple(tokenList, "New Auction", input.getProductName(),
+
+						imgUrl != null ? "http://localhost:8080/img/" + imgUrl : null);
+
 				message = "Successfully saved the auction details";
 			} else {
 				DonationTransaction dt = new DonationTransaction();
@@ -95,6 +107,14 @@ public class AuctionOrDonationService {
 						em.persist(img);
 					}
 				}
+				// Notification Code
+				List<String> tokenList = em
+						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null")
+						.getResultList();
+				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+				fcm.sendPushNotificationToMultiple(tokenList, "New Donation", input.getProductName(),
+
+						imgUrl != null ? "http://localhost:8080/img/" + imgUrl : null);
 				message = "Successfully saved the donation details";
 			}
 			em.getTransaction().commit();
@@ -314,7 +334,7 @@ public class AuctionOrDonationService {
 			for (AuctionTransactionHistory his : history) {
 				AuctionDetailsHistoryRes res = new AuctionDetailsHistoryRes();
 				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + his.getAictionUser().getLastName());
-				res.setAuctionAmount((int)his.getAuctionAmount());
+				res.setAuctionAmount((int) his.getAuctionAmount());
 				res.setAuctionDate(sdf.format(his.getAuctionPriceChangeDate()));
 				results.add(res);
 			}
@@ -355,10 +375,10 @@ public class AuctionOrDonationService {
 						.setParameter("ids", input.getAuctionId()).getResultList();
 
 				res.setProductName(at.getProductName());
-				res.setAuctionAmount((int)at.getAuctionAmount());
+				res.setAuctionAmount((int) at.getAuctionAmount());
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setAuctionStatus(at.getAuctionStatus());
-				res.setInitialAmount((int)at.getInitialAuctionAmount());
+				res.setInitialAmount((int) at.getInitialAuctionAmount());
 				res.setProductDescription(at.getProductDescription());
 				List<String> images = new ArrayList<>(0);
 				for (ProductImage img : imgList) {

@@ -1,6 +1,8 @@
 package com.gannon.webservices;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
@@ -9,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import com.gannon.FirebaseMessaging.FirebseCloudMessagingClass;
 import com.gannon.entity.Users;
 
 @Path("/registration")
@@ -38,6 +41,8 @@ public class RegistrationService {
 			reg.setRegisteredDate(new Date());
 			reg.setStudentId(input.getStudentId());
 			em.persist(reg);
+
+			// Email Code
 			StringBuilder sb = new StringBuilder();
 			sb.append("Dear Admin\n");
 			sb.append(reg.getFirstName() + " " + reg.getLastName()
@@ -52,8 +57,23 @@ public class RegistrationService {
 							+ "</td></tr></table></html>");
 			sb.append("\n Thank you.");
 			sb.append("\n NOTE: This is a system generated email. Please do not reply.");
+
+			Users adminUser = ((Users) em.createQuery("from Users where fAdmin=1").getSingleResult());
 			new EmailSend().emailSend(em, "Gannon Auction Shop – User Activation Request.", sb.toString(),
-					((Users) em.createQuery("from Users where fAdmin=1").getSingleResult()).getEmail());
+					adminUser.getEmail());
+
+			// Notification Code
+
+			FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+			List<String> tokenList = new ArrayList<String>(0);
+			tokenList.add(adminUser.getToken());
+			StringBuilder sd = new StringBuilder();
+			sd.append("Email: " + reg.getEmail());
+			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName());
+			sd.append("Student ID:" + reg.getStudentId());
+
+			fcm.sendPushNotificationToMultiple(tokenList, "New AuctionNew Registeration Request", sd.toString(), null);
+
 			em.getTransaction().commit();
 			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo2 = new SuccessMessagePojo();

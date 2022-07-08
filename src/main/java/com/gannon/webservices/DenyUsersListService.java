@@ -28,14 +28,23 @@ public class DenyUsersListService {
 	public String passWord;
 
 	@Path("/list")
+	@POST
 	@Produces({ "application/json" })
-	@GET
-	public Response list() {
+	@Consumes({ "application/json" })
+	public Response list(userListRequest input) {
 		try {
 			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
-			List<Users> list = em.createQuery("from Users where fActive is not null and fAdmin=0 order by userId desc")
-					.getResultList();
+			List<Users> list = new ArrayList<>(0);
+			if (input.getSearchValue() == null) {
+				list = em.createQuery("from Users where fActive is not null and fAdmin=0 order by userId desc")
+						.getResultList();
+			} else {
+				list = em.createQuery(
+						"from Users where fActive is not null and fAdmin=0 and (firstName like :sea or lastName like :sea or email like :sea or studentId like :sea)"
+								+ " order by userId desc")
+						.setParameter("sea", "%" + input.getSearchValue() + "%").getResultList();
+			}
 			List<ApprovedUserListResponse> pojoList = new ArrayList<>(0);
 			for (Users reg : list) {
 				ApprovedUserListResponse p = new ApprovedUserListResponse();
