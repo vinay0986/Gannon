@@ -26,8 +26,10 @@ public class LoginService {
 			res.setUserName(user.getFirstName());
 			res.setAdminFlag(user.isfAdmin());
 
-			user.setToken(input.getToken());
-			em.merge(user);
+			if (input.getToken() != null) {
+				user.setToken(input.getToken());
+				em.merge(user);
+			}
 
 			em.getTransaction().commit();
 			PersistenceManager.closeEntityManagerFactory();
