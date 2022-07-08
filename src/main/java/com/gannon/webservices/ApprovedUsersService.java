@@ -24,15 +24,24 @@ public class ApprovedUsersService {
 
 	@SuppressWarnings("unchecked")
 	@Path("/list")
-	@GET
+	@POST
 	@Produces({ "application/json" })
-	public Response list() {
+	@Consumes({ "application/json" })
+	public Response list(userListRequest input) {
 		try {
 			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
-			List<Users> list = em.createQuery("from Users where fActive is  null order by registeredDate desc")
-					.getResultList();
+			List<Users> list = new ArrayList<>(0);
+			if (input.getSearchValue() == null) {
+				list = em.createQuery("from Users where fActive is null and fAdmin=0 order by registeredDate desc")
+						.getResultList();
+			} else {
+				list = em.createQuery(
+						"from Users where fActive is  null and fAdmin=0 and (firstName like :sea or lastName like :sea or email like :sea or studentId like :sea) "
+								+ " order by registeredDate desc")
+						.setParameter("sea", "%" + input.getSearchValue() +"%"  ).getResultList();
+			}
 			final List<ApprovedUserListResponse> pojoList = new ArrayList<ApprovedUserListResponse>(0);
 			for (final Users reg : list) {
 				final ApprovedUserListResponse p = new ApprovedUserListResponse();
@@ -84,6 +93,7 @@ public class ApprovedUsersService {
 				sb.append("Regards:\n Online Auction Shop for campus studes team");
 				sb.append("\n\n\tNOTE:This is a system-generated e-mail, Please don't reply to this message");
 				new EmailSend().emailSend(em, "User Account Details", sb.toString(), reg.getEmail());
+
 			} else {
 				reg.setDeActivatedDate(new Date());
 				reg.setDeActivatedUser(input.getUserId());
@@ -105,4 +115,17 @@ public class ApprovedUsersService {
 			return Response.ok((Object) pojo2).build();
 		}
 	}
+}
+
+class userListRequest {
+	private String searchValue;
+
+	public String getSearchValue() {
+		return searchValue;
+	}
+
+	public void setSearchValue(String searchValue) {
+		this.searchValue = searchValue;
+	}
+
 }
