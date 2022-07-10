@@ -69,6 +69,18 @@ public class AuctionTransaction implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "latest_auction_user")
 	private Users latestAuctionUser;
+	
+	@Column(name="closed_by_admin")
+	private boolean closedByAdmin;
+	
+
+	public boolean isClosedByAdmin() {
+		return closedByAdmin;
+	}
+
+	public void setClosedByAdmin(boolean closedByAdmin) {
+		this.closedByAdmin = closedByAdmin;
+	}
 
 	public Users getAuctionCreatedBy() {
 		return auctionCreatedBy;

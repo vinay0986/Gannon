@@ -53,6 +53,18 @@ public class DonationTransaction implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "donation_created_by")
 	private Users donationCreatedBy;
+	
+	@Column(name="closed_by_admin")
+	private boolean closedByAdmin;
+	
+
+	public boolean isClosedByAdmin() {
+		return closedByAdmin;
+	}
+
+	public void setClosedByAdmin(boolean closedByAdmin) {
+		this.closedByAdmin = closedByAdmin;
+	}
 
 	public DonationTransaction() {
 	}
