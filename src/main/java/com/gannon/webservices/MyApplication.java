@@ -21,6 +21,8 @@ public class MyApplication extends Application {
 		this.singletons.add(new AllAuctionDonationsService());
 		this.singletons.add(new UserWinsList());
 		this.singletons.add(new MyFavouriteService());
+		this.singletons.add(new UsersListDropDownService());
+		this.singletons.add(new ProductNamesDropDownService());
 	}
 
 	@Override

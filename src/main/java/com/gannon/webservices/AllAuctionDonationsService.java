@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,26 +39,37 @@ public class AllAuctionDonationsService {
 			em.getTransaction().begin();
 			List<AllAuctionDOnationListServiceRes> results = new ArrayList<AllAuctionDOnationListServiceRes>(0);
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+			Users user = em.find(Users.class, input.getUserId());
+
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
 				List<AuctionTransaction> list = new ArrayList<>(0);
-				if (input.getSearchString() == null) {
-					list = em.createNativeQuery(
-							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby and "
-									+ "auction_created_by IN (select user_id from users where f_active='Y') "
-									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
-							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
-							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-							.getResultList();
-				} else {
-					list = em.createNativeQuery(
-							"select * from auction_transaction where auction_status=:st and auction_created_by!=:cby "
-									+ " and auction_created_by IN (select user_id from users where f_active='Y') "
-									+ " and product_name like '%" + input.getSearchString() + "%'"
-									+ "order by auction_close_date asc LIMIT :lim OFFSET :offset",
-							AuctionTransaction.class).setParameter("st", "OPEN").setParameter("cby", input.getUserId())
-							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-							.getResultList();
-				}
+
+				StringBuilder sb = new StringBuilder(
+						"select * from auction_transaction where auction_created_by IN (select user_id from users where f_active='Y') "
+								+ "and auction_created_by!=:cby ");
+				if (!user.isfAdmin())
+					sb.append(" and auction_status =:st ");
+				if (input.getSearchString() != null)
+					sb.append(" and product_name like '%" + input.getSearchString() + "%'");
+
+				if (!user.isfAdmin())
+					sb.append(" order by auction_close_date asc");
+				else
+					sb.append(" order by auction_close_date desc");
+
+				sb.append(" LIMIT :lim OFFSET :offset");
+
+				Query q = em.createNativeQuery(sb.toString(), AuctionTransaction.class);
+
+				if (!user.isfAdmin())
+					q.setParameter("st", "OPEN");
+
+				q.setParameter("cby", input.getUserId());
+				q.setParameter("lim", input.getLimit());
+				q.setParameter("offset", input.getOffset());
+
+				list = q.getResultList();
 
 				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -106,23 +118,51 @@ public class AllAuctionDonationsService {
 				}
 			} else {
 				List<DonationTransaction> list = new ArrayList<>(0);
-				if (input.getSearchString() == null) {
-					list = em.createNativeQuery(
-							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb"
-									+ " and donation_created_by IN (select user_id from users where f_active='Y') order by donation_close_date desc LIMIT :lim OFFSET :offset",
-							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
-							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-							.getResultList();
-				} else {
-					list = em.createNativeQuery(
-							"select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and "
-									+ " donation_created_by IN (select user_id from users where f_active='Y') "
-									+ " and product_name like '%" + input.getSearchString() + "%'"
-									+ " order by donation_close_date desc LIMIT :lim OFFSET :offset",
-							DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb", input.getUserId())
-							.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-							.getResultList();
-				}
+
+				StringBuilder sb = new StringBuilder(
+						"select * from donation_transaction where donation_created_by IN (select user_id from users where f_active='Y') "
+								+ "and donation_created_by!=:dcb ");
+				if (!user.isfAdmin())
+					sb.append(" and donation_product_status =:st ");
+				if (input.getSearchString() != null)
+					sb.append(" and product_name like '%" + input.getSearchString() + "%'");
+
+				if (!user.isfAdmin())
+					sb.append(" order by donation_close_date asc");
+				else
+					sb.append(" order by donation_close_date desc");
+
+				sb.append(" LIMIT :lim OFFSET :offset");
+
+				Query q = em.createNativeQuery(sb.toString(), DonationTransaction.class);
+
+				if (!user.isfAdmin())
+					q.setParameter("st", "OPEN");
+
+				q.setParameter("dcb", input.getUserId());
+				q.setParameter("lim", input.getLimit());
+				q.setParameter("offset", input.getOffset());
+
+				list = q.getResultList();
+
+				/*
+				 * if (input.getSearchString() == null) { list = em.createNativeQuery(
+				 * "select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb"
+				 * +
+				 * " and donation_created_by IN (select user_id from users where f_active='Y') order by donation_close_date desc LIMIT :lim OFFSET :offset"
+				 * , DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb",
+				 * input.getUserId()) .setParameter("lim",
+				 * input.getLimit()).setParameter("offset", input.getOffset()) .getResultList();
+				 * } else { list = em.createNativeQuery(
+				 * "select * from donation_transaction where  donation_product_status=:st and donation_created_by!=:dcb and "
+				 * + " donation_created_by IN (select user_id from users where f_active='Y') " +
+				 * " and product_name like '%" + input.getSearchString() + "%'" +
+				 * " order by donation_close_date desc LIMIT :lim OFFSET :offset",
+				 * DonationTransaction.class).setParameter("st", "OPEN").setParameter("dcb",
+				 * input.getUserId()) .setParameter("lim",
+				 * input.getLimit()).setParameter("offset", input.getOffset()) .getResultList();
+				 * }
+				 */
 
 				List<Integer> ids = list.stream().map(it -> it.getDonationTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -243,6 +283,53 @@ public class AllAuctionDonationsService {
 		}
 	}
 
+	@Path("/adminUpdate")
+	@Produces({ "application/json" })
+	@Consumes({ "application/json" })
+	@POST
+	public Response adminUpdate(final AllAuctionStatusUpdateRequest input) {
+		try {
+			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManager em = emf.createEntityManager();
+			em.getTransaction().begin();
+			Users user = em.find(Users.class, input.getUserId());
+
+			if (input.getAuctionId() != 0) {
+				AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
+
+				at.setAuctionStatus(input.getStatus());
+				if (input.getStatus().equalsIgnoreCase("OPEN")) {
+					at.setClosedByAdmin(false);
+				} else
+					at.setClosedByAdmin(true);
+				em.merge(at);
+			} else {
+				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
+				at.setDonationProductStatus(input.getStatus());
+				if (input.getStatus().equalsIgnoreCase("OPEN")) {
+					at.setClosedByAdmin(false);
+				} else
+					at.setClosedByAdmin(true);
+				em.merge(at);
+			}
+
+			em.getTransaction().commit();
+			PersistenceManager.closeEntityManagerFactory();
+			SuccessMessagePojo pojo = new SuccessMessagePojo();
+			pojo.setMessage("Successfully updated the auction amount");
+			pojo.setStatusCode(Response.Status.OK.getStatusCode());
+			pojo.setStatus("Success");
+			return Response.ok((Object) pojo).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+			pojo2.setError("Unable to process the request");
+			pojo2.setStatus("failure");
+			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+			return Response.ok((Object) pojo2).build();
+		}
+	}
+
 	@Path("/details")
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
@@ -265,9 +352,10 @@ public class AllAuctionDonationsService {
 						.setParameter("ids", input.getAuctionId()).getResultList();
 
 				res.setProductName(at.getProductName());
-				res.setAuctionAmount((int)at.getAuctionAmount());
+				res.setAuctionAmount((int) at.getAuctionAmount());
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setProductDescription(at.getProductDescription());
+				res.setStatus(at.getAuctionStatus());
 				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
 				res.setSellerEMail(user.getEmail());
 				res.setSellerPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
@@ -289,6 +377,7 @@ public class AllAuctionDonationsService {
 				res.setProductName(at.getProductName());
 				res.setAuctionCloseDate(sdf.format(at.getDonationCloseDate()));
 				res.setProductDescription(at.getProductDescription());
+				res.setStatus(at.getDonationProductStatus());
 				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
 				res.setSellerEMail(user.getEmail());
 				res.setSellerPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
@@ -328,6 +417,15 @@ class AllAuctionDonationDetailsResponse {
 	private String sellerName;
 	private String sellerEMail;
 	private String sellerPhoneNumber;
+	private String status;
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	public String getSellerName() {
 		return sellerName;
@@ -414,6 +512,46 @@ class AllAuctionAmountUpdateRequest {
 
 	public void setAuctionAmount(int auctionAmount) {
 		this.auctionAmount = auctionAmount;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+}
+
+class AllAuctionStatusUpdateRequest {
+	private int auctionId;
+	private String status;
+	private int userId;
+	private int donationId;
+
+	public int getDonationId() {
+		return donationId;
+	}
+
+	public void setDonationId(int donationId) {
+		this.donationId = donationId;
+	}
+
+	public int getAuctionId() {
+		return auctionId;
+	}
+
+	public void setAuctionId(int auctionId) {
+		this.auctionId = auctionId;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public int getUserId() {

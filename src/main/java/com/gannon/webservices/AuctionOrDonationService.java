@@ -434,6 +434,15 @@ public class AuctionOrDonationService {
 			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
 				AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
+
+				if (at.isClosedByAdmin()) {
+					ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+					pojo2.setError("Auction closed by admin,Not possible to update the auction details");
+					pojo2.setStatus("failure");
+					pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+					return Response.ok((Object) pojo2).build();
+				}
+
 				at.setProductName(input.getProductName());
 				at.setProductDescription(input.getProductDescription());
 				at.setAuctionCloseDate(form.parse(input.getAuctionCloseDate()));
@@ -452,6 +461,14 @@ public class AuctionOrDonationService {
 
 			} else {
 				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
+				if (at.isClosedByAdmin()) {
+					ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+					pojo2.setError("Donation closed by admin,Not possible to update the Donation details");
+					pojo2.setStatus("failure");
+					pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+					return Response.ok((Object) pojo2).build();
+				}
+
 				at.setProductName(input.getProductName());
 				at.setProductDescription(input.getProductDescription());
 				at.setDonationCloseDate(form.parse(input.getAuctionCloseDate()));
