@@ -23,7 +23,7 @@ public class AuctionCloseJob implements Job {
 		em.getTransaction().begin();
 
 		List<AuctionTransaction> list = em.createNativeQuery(
-				"select * from auction_transaction where auction_status=:st and DATE(auction_close_date) = CURDATE()",
+				"select * from auction_transaction where auction_status=:st and DATE(auction_close_date) <= CURDATE()",
 				AuctionTransaction.class).setParameter("st", "OPEN").getResultList();
 		System.out.println("--------------size is ------------------" + list.size());
 
