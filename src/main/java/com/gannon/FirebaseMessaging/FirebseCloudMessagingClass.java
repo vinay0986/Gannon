@@ -12,17 +12,17 @@ import java.util.List;
 import org.json.JSONObject;
 
 public class FirebseCloudMessagingClass {
-	public final static String AUTH_KEY_FCM = "AAAAUIUiDa4:APA91bHKDA23d0IwTMEjZGOKTFHx0id3AEJoOpKe6rwAdNisieAd_sDuC46i1Y6eORvmUFtO6Yd7zQk8W6n_NfvwFMLsqxDDttuHMarEawNZFMeFwsSldzoNbcBvLQQO1edBN6_0p7Kc";
+	public final static String AUTH_KEY_FCM = "AAAAvIyPMQE:APA91bFUsDPCRxHqLnETNjCCqDyw1g73mT7wu0Uj4qsWQ7bky5FboxznIoEn3-ISgvXpbGTvhUoZjH_VonsCtBWKiNFdPxs22ayQkai3p31TvYkL9o4rK3f_7hS2hs6s3HItwuI5kGRb";
 	public final static String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
 	public static void main(String[] args) {
 		List<String> list = new ArrayList<String>(0);
 		list.add(
-				"d7uIHpbwT6KZVf9Rfwul4Q:APA91bEy-HEEa4Ou2wKZ49hzJlvI6hqF2f69gipmEOslOGVezujFN8u1ZwtxTdwKaF4WSXylYT_aRcQ3Yhwqbz55IyqvWjm2SxAQlb5VIaMIOJKN-YqR7blQU6f1nD-Ie_verSQ0hDiF");
+				"APA91bEy-HEEa4Ou2wKZ49hzJlvI6hqF2f69gipmEOslOGVezujFN8u1ZwtxTdwKaF4WSXylYT_aRcQ3Yhwqbz55IyqvWjm2SxAQlb5VIaMIOJKN-YqR7blQU6f1nD-Ie_verSQ0hDiF");
 
 		try {
 			FirebseCloudMessagingClass.sendPushNotification(
-					"d7uIHpbwT6KZVf9Rfwul4Q:APA91bEy-HEEa4Ou2wKZ49hzJlvI6hqF2f69gipmEOslOGVezujFN8u1ZwtxTdwKaF4WSXylYT_aRcQ3Yhwqbz55IyqvWjm2SxAQlb5VIaMIOJKN-YqR7blQU6f1nD-Ie_verSQ0hDiF");
+					"flFmXbzOQtOSpFs-MiCgl5:APA91bF4rsWNA8oCFvI3dyjsVH6UP0FQNc32FvX68ItWuaEJtemk_-L71Ep5qBQeDQenD-ZpBzihSHhEFK1HkR0F171KoDa43CV-uccN4Xt6YDaGF6Lb11PhCTyROmWlmMZji-4MpEOC");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,7 +103,7 @@ public class FirebseCloudMessagingClass {
 		JSONObject info = new JSONObject();
 		info.put("title", "New Registration"); // Notification title
 		info.put("body", "Email:Vinay0986@gmail.com \n Name:Vinay\n Student Id:Stu1234"); // Notification
-		info.put("image", "http://localhost:8080/img/1656250147366.jpg");
+		// info.put("image", "http://localhost:8080/img/1656250147366.jpg");
 		// body
 		json.put("notification", info);
 		try {
