@@ -17,6 +17,8 @@ import com.gannon.entity.Users;
 
 @Path("/registration")
 public class RegistrationService {
+	
+	//commented
 
 	public static void main(String[] args) {
 		String acceptedvalue = "gmail.com";
