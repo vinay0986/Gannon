@@ -18,7 +18,7 @@ public class LoginService {
 		try {
 			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
-			Users user = (Users) em.createQuery("from Users where email=:em and passWord=:pwd")
+			Users user = (Users) em.createQuery("from Users where email=:em and passWord=:pwd and fActive='Y'")
 					.setParameter("em", input.getUserName()).setParameter("pwd", input.getPassword()).getSingleResult();
 			LoginServiceResponse res = new LoginServiceResponse();
 			res.setUserId(user.getUserId().intValue());
