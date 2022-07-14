@@ -12,10 +12,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.gannon.FirebaseMessaging.FirebseCloudMessagingClass;
+import com.gannon.entity.ConstantSettings;
 import com.gannon.entity.Users;
 
 @Path("/registration")
 public class RegistrationService {
+
+	public static void main(String[] args) {
+		String acceptedvalue = "gmail.com";
+		String email = "vinay.boday@gmail.com";
+		String arr[] = email.split("@");
+		if (arr.length == 1) {
+			System.out.println("Invalid email format");
+			return;
+		}
+		if (!arr[1].equalsIgnoreCase(acceptedvalue)) {
+			System.out.println("Only  " + acceptedvalue + " domain is allowed");
+		} else {
+			System.out.println("proceed to success");
+		}
+	}
+
 	@Path("/save")
 	@POST
 	@Consumes({ "application/json" })
@@ -24,6 +41,33 @@ public class RegistrationService {
 		try {
 			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
+
+			ConstantSettings settings = null;
+			try {
+				settings = (ConstantSettings) em
+						.createQuery("from ConstantSettings where key='accepted domain' and fActive='Y'")
+						.getSingleResult();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			String arr[] = input.getEmail().split("@");
+			if (arr.length == 1) {
+				ErrorMessagePojo pojo = new ErrorMessagePojo();
+				pojo.setError("Invalid email format");
+				pojo.setStatus("failure");
+				pojo.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+				return Response.ok(pojo).build();
+			}
+			if (settings != null && settings.getValue() != null && !settings.getValue().equalsIgnoreCase("")) {
+				if (!arr[1].equalsIgnoreCase(settings.getValue())) {
+					ErrorMessagePojo pojo = new ErrorMessagePojo();
+					pojo.setError("Only  " + settings.getValue() + " domain is allowed");
+					pojo.setStatus("failure");
+					pojo.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+					return Response.ok(pojo).build();
+				}
+			}
+
 			if (!em.createQuery("from Users where email=:em").setParameter("em", input.getEmail()).getResultList()
 					.isEmpty()) {
 				ErrorMessagePojo pojo = new ErrorMessagePojo();
