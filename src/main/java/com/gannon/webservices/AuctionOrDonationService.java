@@ -80,7 +80,7 @@ public class AuctionOrDonationService {
 				}
 				// Notification Code
 				List<String> tokenList = em
-						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null")
+						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
 						.getResultList();
 				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
 				fcm.sendPushNotificationToMultiple(tokenList, "New Auction", input.getProductName(),
@@ -109,7 +109,7 @@ public class AuctionOrDonationService {
 				}
 				// Notification Code
 				List<String> tokenList = em
-						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null")
+						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
 						.getResultList();
 				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
 				fcm.sendPushNotificationToMultiple(tokenList, "New Donation", input.getProductName(),
