@@ -18,23 +18,6 @@ import com.gannon.entity.Users;
 @Path("/registration")
 public class RegistrationService {
 	
-	//commented
-
-	public static void main(String[] args) {
-		String acceptedvalue = "gmail.com";
-		String email = "vinay.boday@gmail.com";
-		String arr[] = email.split("@");
-		if (arr.length == 1) {
-			System.out.println("Invalid email format");
-			return;
-		}
-		if (!arr[1].equalsIgnoreCase(acceptedvalue)) {
-			System.out.println("Only  " + acceptedvalue + " domain is allowed");
-		} else {
-			System.out.println("proceed to success");
-		}
-	}
-
 	@Path("/save")
 	@POST
 	@Consumes({ "application/json" })
@@ -114,8 +97,8 @@ public class RegistrationService {
 			List<String> tokenList = new ArrayList<String>(0);
 			tokenList.add(adminUser.getToken());
 			StringBuilder sd = new StringBuilder();
-			sd.append("Email: " + reg.getEmail());
-			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName());
+			sd.append("Email: " + reg.getEmail()+"\n");
+			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName()+"\n");
 			sd.append("Student ID:" + reg.getStudentId());
 
 			fcm.sendPushNotificationToMultiple(tokenList, "New AuctionNew Registeration Request", sd.toString(), null);
