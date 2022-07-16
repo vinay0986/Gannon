@@ -36,7 +36,9 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import com.gannon.FirebaseMessaging.FirebseCloudMessagingClass;
 import com.gannon.entity.AuctionTransaction;
 import com.gannon.entity.AuctionTransactionHistory;
+import com.gannon.entity.ConstantSettings;
 import com.gannon.entity.DonationTransaction;
+import com.gannon.entity.Notifications;
 import com.gannon.entity.ProductImage;
 import com.gannon.entity.Users;
 
@@ -56,6 +58,16 @@ public class AuctionOrDonationService {
 			final Users reg = (Users) em.find(Users.class, (Object) input.getUserId());
 			String message = null;
 			String imgUrl = null;
+
+			ConstantSettings settings = null;
+			try {
+				settings = (ConstantSettings) em
+						.createQuery("from ConstantSettings where key='Application URL' and fActive='Y'")
+						.getSingleResult();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
 				AuctionTransaction au = new AuctionTransaction();
 				au.setAuctionAmount(input.getAuctionAmount());
@@ -78,14 +90,27 @@ public class AuctionOrDonationService {
 					}
 					imgUrl = input.getImagesList().get(0);
 				}
-				// Notification Code
-				List<String> tokenList = em
-						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+
+				String fullImageUrl = null;
+				if (settings != null && settings.getValue() != null && imgUrl != null)
+					fullImageUrl = settings.getValue() + imgUrl;
+
+				// Push Notification Code
+				List<String> tokenList = em.createQuery(
+						"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
 						.getResultList();
 				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
-				fcm.sendPushNotificationToMultiple(tokenList, "New Auction", input.getProductName(),
+				fcm.sendPushNotificationToMultiple(tokenList, "New Auction", input.getProductName(), fullImageUrl);
 
-						imgUrl != null ? "http://localhost:8080/img/" + imgUrl : null);
+				// Application Level notifications code
+				Notifications notification = new Notifications();
+				notification.setAuctionTransaction(au);
+				notification.setCreatedBy(input.getUserId());
+				notification.setCreatedDate(new Date());
+				notification.setDonationTransaction(null);
+				notification.setImageUrl(fullImageUrl);
+				notification.setMessage("New Auction \n" + input.getProductName());
+				em.persist(notification);
 
 				message = "Successfully saved the auction details";
 			} else {
@@ -106,15 +131,31 @@ public class AuctionOrDonationService {
 						img.setUploadedDate(new Date());
 						em.persist(img);
 					}
+					imgUrl = input.getImagesList().get(0);
 				}
-				// Notification Code
-				List<String> tokenList = em
-						.createQuery("select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+
+				String fullImageUrl = null;
+				if (settings != null && settings.getValue() != null && imgUrl != null)
+					fullImageUrl = settings.getValue() + imgUrl;
+
+				// Push Notification Code
+				List<String> tokenList = em.createQuery(
+						"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
 						.getResultList();
 				FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
-				fcm.sendPushNotificationToMultiple(tokenList, "New Donation", input.getProductName(),
+				fcm.sendPushNotificationToMultiple(tokenList, "New Donation", input.getProductName(), fullImageUrl);
 
-						imgUrl != null ? "http://localhost:8080/img/" + imgUrl : null);
+				// App level notification code
+				// Application Level notifications code
+				Notifications notification = new Notifications();
+				notification.setAuctionTransaction(null);
+				notification.setCreatedBy(input.getUserId());
+				notification.setCreatedDate(new Date());
+				notification.setDonationTransaction(dt);
+				notification.setImageUrl(fullImageUrl);
+				notification.setMessage("New Donation \n" + input.getProductName());
+				em.persist(notification);
+
 				message = "Successfully saved the donation details";
 			}
 			em.getTransaction().commit();
