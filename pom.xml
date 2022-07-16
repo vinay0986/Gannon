@@ -11,6 +11,29 @@
 		<resteasy.version>3.15.3.Final</resteasy.version>
 	</properties>
 	<dependencies>
+		 <!-- <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>5.3.6.Final</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>c3p0</artifactId>
+					<groupId>c3p0</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
+		<!--<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.2</version>
+		</dependency> -->
+
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
