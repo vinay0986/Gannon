@@ -101,7 +101,7 @@ public class RegistrationService {
 			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName()+"\n");
 			sd.append("Student ID:" + reg.getStudentId());
 
-			fcm.sendPushNotificationToMultiple(tokenList, "New AuctionNew Registeration Request", sd.toString(), null);
+			fcm.sendPushNotificationToMultiple(tokenList, "New Registeration Request", sd.toString(), null);
 
 			em.getTransaction().commit();
 			PersistenceManager.closeEntityManagerFactory();
