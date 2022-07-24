@@ -17,14 +17,15 @@ import com.gannon.entity.Users;
 
 @Path("/registration")
 public class RegistrationService {
-	
+
 	@Path("/save")
 	@POST
 	@Consumes({ "application/json" })
 	@Produces({ "application/json" })
 	public Response save(RegistrationSaveRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
+			EntityManager em = manager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
 
 			ConstantSettings settings = null;
@@ -33,7 +34,6 @@ public class RegistrationService {
 						.createQuery("from ConstantSettings where key='accepted domain' and fActive='Y'")
 						.getSingleResult();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			String arr[] = input.getEmail().split("@");
 			if (arr.length == 1) {
@@ -97,14 +97,13 @@ public class RegistrationService {
 			List<String> tokenList = new ArrayList<String>(0);
 			tokenList.add(adminUser.getToken());
 			StringBuilder sd = new StringBuilder();
-			sd.append("Email: " + reg.getEmail()+"\n");
-			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName()+"\n");
+			sd.append("Email: " + reg.getEmail() + "\n");
+			sd.append("Name: " + reg.getFirstName() + " " + reg.getLastName() + "\n");
 			sd.append("Student ID:" + reg.getStudentId());
 
 			fcm.sendPushNotificationToMultiple(tokenList, "New Registeration Request", sd.toString(), null);
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo2 = new SuccessMessagePojo();
 			pojo2.setMessage("Actiovation mail sent successfully");
 			pojo2.setStatusCode(Response.Status.OK.getStatusCode());
@@ -117,6 +116,8 @@ public class RegistrationService {
 			pojo3.setStatus("failure");
 			pojo3.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo3).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 

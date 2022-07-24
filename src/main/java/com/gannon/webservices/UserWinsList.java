@@ -26,19 +26,19 @@ public class UserWinsList {
 	@Consumes({ "application/json" })
 	@POST
 	public Response list(final AuctionOrDonationListServiceReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<AuctionDOnationListServiceRes> results = new ArrayList<AuctionDOnationListServiceRes>(0);
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
-				List<AuctionTransaction> list = em
-						.createNativeQuery(
-								"select * from auction_transaction where latest_auction_user=:usr and auction_status='CLOSED' "
-										+ " order by auction_transaction_id desc LIMIT :lim OFFSET :offset",
-								AuctionTransaction.class)
-						.setParameter("usr", input.getUserId()).setParameter("lim", input.getLimit())
-						.setParameter("offset", input.getOffset()).getResultList();
+				List<AuctionTransaction> list = em.createNativeQuery(
+						"select * from auction_transaction where latest_auction_user=:usr and auction_status='CLOSED' "
+								+ " order by auction_transaction_id desc LIMIT :lim OFFSET :offset",
+						AuctionTransaction.class).setParameter("usr", input.getUserId())
+						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
+						.getResultList();
 
 				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -71,9 +71,8 @@ public class UserWinsList {
 								"select * from donation_transaction where donation_created_by=:usr "
 										+ " order by donation_transaction_id desc LIMIT :lim OFFSET :offset",
 								DonationTransaction.class)
-						.setParameter("usr", input.getUserId())
-						.setParameter("lim", input.getLimit()).setParameter("offset", input.getOffset())
-						.getResultList();
+						.setParameter("usr", input.getUserId()).setParameter("lim", input.getLimit())
+						.setParameter("offset", input.getOffset()).getResultList();
 
 				List<Integer> ids = list.stream().map(it -> it.getDonationTransactionId()).collect(Collectors.toList());
 				Map<Integer, String> imgMap = new HashMap<>(0);
@@ -102,7 +101,6 @@ public class UserWinsList {
 
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(results);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -115,6 +113,8 @@ public class UserWinsList {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

@@ -18,10 +18,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import com.gannon.FirebaseMessaging.FirebseCloudMessagingClass;
 import com.gannon.entity.AuctionDonationFavouriteHistory;
 import com.gannon.entity.AuctionTransaction;
 import com.gannon.entity.AuctionTransactionHistory;
 import com.gannon.entity.DonationTransaction;
+import com.gannon.entity.Notifications;
 import com.gannon.entity.ProductImage;
 import com.gannon.entity.Users;
 
@@ -33,8 +35,10 @@ public class AllAuctionDonationsService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response list(final AuctionOrDonationListServiceReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<AllAuctionDOnationListServiceRes> results = new ArrayList<AllAuctionDOnationListServiceRes>(0);
@@ -208,7 +212,7 @@ public class AllAuctionDonationsService {
 
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
+
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(results);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -223,6 +227,8 @@ public class AllAuctionDonationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -231,8 +237,9 @@ public class AllAuctionDonationsService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response list(final AllAuctionAmountUpdateRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Users user = em.find(Users.class, input.getUserId());
@@ -267,7 +274,6 @@ public class AllAuctionDonationsService {
 			em.persist(his);
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage("Successfully updated the auction amount");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -280,6 +286,8 @@ public class AllAuctionDonationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -288,14 +296,16 @@ public class AllAuctionDonationsService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response adminUpdate(final AllAuctionStatusUpdateRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Users user = em.find(Users.class, input.getUserId());
 
 			if (input.getAuctionId() != 0) {
 				AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
+				String oldStatus = at.getAuctionStatus();
 
 				at.setAuctionStatus(input.getStatus());
 				if (input.getStatus().equalsIgnoreCase("OPEN")) {
@@ -303,30 +313,80 @@ public class AllAuctionDonationsService {
 				} else
 					at.setClosedByAdmin(true);
 				em.merge(at);
+
+				if (!oldStatus.equalsIgnoreCase(input.getStatus())) {
+					if (input.getStatus().equalsIgnoreCase("OPEN")) {
+						List<String> tokenList = em.createQuery(
+								"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+								.getResultList();
+						FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+						fcm.sendPushNotificationToMultiple(tokenList, "Auction Opened", at.getProductName(), null);
+
+						// App level notification code
+						// Application Level notifications code
+						Notifications notification = new Notifications();
+						notification.setAuctionTransaction(at);
+						notification.setCreatedBy(at.getAuctionCreatedBy().getUserId());
+						notification.setCreatedDate(new Date());
+						notification.setDonationTransaction(null);
+						notification.setImageUrl(null);
+						notification.setMessage("Auction Reopned \n" + at.getProductName());
+						em.persist(notification);
+					}
+				}
+
 			} else {
 				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
+
+				String oldStatus = at.getDonationProductStatus();
+
 				at.setDonationProductStatus(input.getStatus());
 				if (input.getStatus().equalsIgnoreCase("OPEN")) {
 					at.setClosedByAdmin(false);
 				} else
 					at.setClosedByAdmin(true);
 				em.merge(at);
+
+				if (!oldStatus.equalsIgnoreCase(at.getDonationProductStatus())) {
+					if (at.getDonationProductStatus().equalsIgnoreCase("OPEN")) {
+						List<String> tokenList = em.createQuery(
+								"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+								.getResultList();
+						FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+						fcm.sendPushNotificationToMultiple(tokenList, "Donation Opened", at.getProductName(), null);
+
+						// App level notification code
+						// Application Level notifications code
+						Notifications notification = new Notifications();
+						notification.setAuctionTransaction(null);
+						notification.setCreatedBy(at.getDonationCreatedBy().getUserId());
+						notification.setCreatedDate(new Date());
+						notification.setDonationTransaction(at);
+						notification.setImageUrl(null);
+						notification.setMessage("Auction Reopned \n" + at.getProductName());
+						em.persist(notification);
+					}
+				}
+
 			}
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage("Successfully updated the auction amount");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
 			pojo.setStatus("Success");
 			return Response.ok((Object) pojo).build();
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
 			pojo2.setError("Unable to process the request");
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -335,9 +395,10 @@ public class AllAuctionDonationsService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response details(final AuctionDonationDetailsRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			AllAuctionDonationDetailsResponse res = new AllAuctionDonationDetailsResponse();
@@ -356,7 +417,7 @@ public class AllAuctionDonationsService {
 				res.setAuctionCloseDate(sdf.format(at.getAuctionCloseDate()));
 				res.setProductDescription(at.getProductDescription());
 				res.setStatus(at.getAuctionStatus());
-				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
+				res.setSellerName(user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 				res.setSellerEMail(user.getEmail());
 				res.setSellerPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
 
@@ -378,7 +439,7 @@ public class AllAuctionDonationsService {
 				res.setAuctionCloseDate(sdf.format(at.getDonationCloseDate()));
 				res.setProductDescription(at.getProductDescription());
 				res.setStatus(at.getDonationProductStatus());
-				res.setSellerName(user.getFirstName() + "  " + user.getLastName() != null ? user.getLastName() : "");
+				res.setSellerName(user.getFirstName() + "  " + (user.getLastName() != null ? user.getLastName() : ""));
 				res.setSellerEMail(user.getEmail());
 				res.setSellerPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
 				List<String> images = new ArrayList<>(0);
@@ -388,7 +449,6 @@ public class AllAuctionDonationsService {
 				res.setImagesList(images);
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(res);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -403,6 +463,8 @@ public class AllAuctionDonationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 

@@ -15,8 +15,9 @@ public class LoginService {
 	@Produces({ "application/json" })
 	@POST
 	public Response save(LoginServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
+			EntityManager em = manager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
 			Users user = (Users) em.createQuery("from Users where email=:em and passWord=:pwd and fActive='Y'")
 					.setParameter("em", input.getUserName()).setParameter("pwd", input.getPassword()).getSingleResult();
@@ -32,7 +33,6 @@ public class LoginService {
 			}
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(res);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -45,6 +45,8 @@ public class LoginService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

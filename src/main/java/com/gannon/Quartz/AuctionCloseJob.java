@@ -17,25 +17,29 @@ public class AuctionCloseJob implements Job {
 
 	@Override
 	public void execute(final JobExecutionContext ctx) throws JobExecutionException {
+		PersistenceManager manager = new PersistenceManager();
+		try {
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
+			final EntityManager em = emf.createEntityManager();
+			em.getTransaction().begin();
 
-		final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
-		final EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
+			List<AuctionTransaction> list = em.createNativeQuery(
+					"select * from auction_transaction where auction_status=:st and DATE(auction_close_date) <= CURDATE()",
+					AuctionTransaction.class).setParameter("st", "OPEN").getResultList();
+			System.out.println("--------------size is ------------------" + list.size());
 
-		List<AuctionTransaction> list = em.createNativeQuery(
-				"select * from auction_transaction where auction_status=:st and DATE(auction_close_date) <= CURDATE()",
-				AuctionTransaction.class).setParameter("st", "OPEN").getResultList();
-		System.out.println("--------------size is ------------------" + list.size());
+			if (!list.isEmpty()) {
+				List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
+				int qu = em.createQuery(
+						"update AuctionTransaction set auctionStatus='CLOSED' where auctionTransactionId IN (:ids)")
+						.setParameter("ids", ids).executeUpdate();
 
-		if (!list.isEmpty()) {
-			List<Integer> ids = list.stream().map(it -> it.getAuctionTransactionId()).collect(Collectors.toList());
-			int qu = em
-					.createQuery(
-							"update AuctionTransaction set auctionStatus='CLOSED' where auctionTransactionId IN (:ids)")
-					.setParameter("ids", ids).executeUpdate();
-			
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
-		em.getTransaction().commit();
-		PersistenceManager.closeEntityManagerFactory();
 	}
 }

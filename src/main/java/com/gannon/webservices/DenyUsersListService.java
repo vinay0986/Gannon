@@ -2,24 +2,15 @@ package com.gannon.webservices;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+
 import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import com.gannon.entity.ConstantSettings;
 import com.gannon.entity.Users;
 
 @Path("/denyUsersListService")
@@ -32,8 +23,9 @@ public class DenyUsersListService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response list(userListRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
+			EntityManager em = manager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
 			List<Users> list = new ArrayList<>(0);
 			if (input.getSearchValue() == null) {
@@ -55,10 +47,12 @@ public class DenyUsersListService {
 				p.setRegistrationId(reg.getUserId().intValue());
 				p.setStatus(reg.getfActive().equalsIgnoreCase("Y") ? "Activated" : "Deactivated");
 				p.setStudentId(reg.getStudentId());
+				if (!reg.getfActive().equalsIgnoreCase("Y")) {
+					p.setDenyReason(reg.getDenyReason());
+				}
 				pojoList.add(p);
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(pojoList);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -71,6 +65,8 @@ public class DenyUsersListService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -78,9 +74,10 @@ public class DenyUsersListService {
 	@POST
 	@Consumes({ "application/json" })
 	@Produces({ "application/json" })
-	public Response save(ApprovedUserSaveRequest input) {
+	public Response save(DenyUserSaveRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
+			EntityManager em = manager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
 			Users reg = (Users) em.find(Users.class, Integer.valueOf(input.getRegistrationId()));
 			reg.setfActive(input.getApproved());
@@ -93,7 +90,6 @@ public class DenyUsersListService {
 			}
 			em.merge(reg);
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage("Successfully Updated");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -106,7 +102,39 @@ public class DenyUsersListService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
+}
+
+class DenyUserSaveRequest {
+	private int registrationId;
+	private String approved;
+	private int userId;
+
+	public int getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(final int userId) {
+		this.userId = userId;
+	}
+
+	public String getApproved() {
+		return this.approved;
+	}
+
+	public void setApproved(final String approved) {
+		this.approved = approved;
+	}
+
+	public int getRegistrationId() {
+		return this.registrationId;
+	}
+
+	public void setRegistrationId(final int registrationId) {
+		this.registrationId = registrationId;
+	}
 }

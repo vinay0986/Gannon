@@ -21,8 +21,9 @@ public class UsersListDropDownService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response save(final UsersListDropDownServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<Users> list = new ArrayList<>(0);
@@ -48,7 +49,6 @@ public class UsersListDropDownService {
 				}
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			List<String> names = list.stream().map(it -> it.getFirstName() + " " + it.getLastName())
 					.collect(Collectors.toList());
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
@@ -63,6 +63,8 @@ public class UsersListDropDownService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

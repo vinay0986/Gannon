@@ -31,8 +31,9 @@ public class MyFavouriteService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response save(final FavouriteUpateServiceReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Users user = em.find(Users.class, input.getUserId());
@@ -68,7 +69,6 @@ public class MyFavouriteService {
 				}
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage("Successfully Updated the favourite details");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -82,6 +82,8 @@ public class MyFavouriteService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		}finally {
+			manager.closeEntityManagerFactory();
 		}
 
 	}
@@ -91,8 +93,9 @@ public class MyFavouriteService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response list(final AuctionOrDonationListServiceReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<AllAuctionDOnationListServiceRes> results = new ArrayList<AllAuctionDOnationListServiceRes>(0);
@@ -125,7 +128,7 @@ public class MyFavouriteService {
 					res.setProductName(at.getProductName());
 					res.setAuctionId(at.getAuctionTransactionId());
 					res.setClosingDate(sdf.format(at.getAuctionCloseDate()));
-					res.setAuctionAmount((int)at.getAuctionAmount());
+					res.setAuctionAmount((int) at.getAuctionAmount());
 					if (!imgMap.isEmpty()) {
 						if (imgMap.containsKey(at.getAuctionTransactionId())) {
 							res.setImageUrl("img/" + imgMap.get(at.getAuctionTransactionId()));
@@ -170,7 +173,6 @@ public class MyFavouriteService {
 
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(results);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -183,6 +185,8 @@ public class MyFavouriteService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

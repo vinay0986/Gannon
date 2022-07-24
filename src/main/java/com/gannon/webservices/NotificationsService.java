@@ -26,8 +26,9 @@ public class NotificationsService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response count(final NotificationServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Long count = (Long) em.createQuery(
@@ -40,7 +41,6 @@ public class NotificationsService {
 			NotificationServiceCountResponse response = new NotificationServiceCountResponse();
 			response.setCount(count.intValue());
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(response);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -53,6 +53,8 @@ public class NotificationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -61,8 +63,9 @@ public class NotificationsService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response list(final NotificationServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<Notifications> list = em
@@ -103,7 +106,6 @@ public class NotificationsService {
 			}
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(pojoList);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -116,6 +118,8 @@ public class NotificationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -124,8 +128,9 @@ public class NotificationsService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response update(final NotificationServiceReadUpdateReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Notifications notificationObj = null;
@@ -155,7 +160,6 @@ public class NotificationsService {
 			response.setCount(count.intValue());
 
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(response);
@@ -170,6 +174,8 @@ public class NotificationsService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

@@ -19,15 +19,16 @@ import com.gannon.entity.Users;
 
 @Path("/productNamesDropDownService")
 public class ProductNamesDropDownService {
-	
-	//Testing
+
+	// Testing
 
 	@POST
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response save(final UsersListDropDownServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<AuctionTransaction> list = new ArrayList<>(0);
@@ -80,7 +81,6 @@ public class ProductNamesDropDownService {
 				list1 = q.getResultList();
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			List<String> names = new ArrayList<>(0);
 			if (input.getType().equalsIgnoreCase("Auction")) {
 				names = list.stream().map(it -> it.getProductName()).collect(Collectors.toList());
@@ -99,6 +99,8 @@ public class ProductNamesDropDownService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

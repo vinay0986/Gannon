@@ -17,21 +17,22 @@ public class ForgotPasswordService {
 	@Produces({ "application/json" })
 	@POST
 	public Response save(ForgotPasswordServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			EntityManager em = PersistenceManager.getEntityManagerFactory().createEntityManager();
+			EntityManager em = manager.getEntityManagerFactory().createEntityManager();
 			em.getTransaction().begin();
 			try {
 				Users users = (Users) em.createQuery("from Users where email=:e and fActive='Y'")
 						.setParameter("e", input.getEmail()).getSingleResult();
 				StringBuilder sb = new StringBuilder();
-				sb.append("Dear " + users.getFirstName()+" "+users.getLastName() + ",\n");
+				sb.append("Dear " + users.getFirstName() + " " + users.getLastName() + ",\n");
 				sb.append("Thank you for contacting Gannon Auction Shop support. Please find your password details.\n");
-				sb.append("Password:" + users.getPassWord()+"\n");
+				sb.append("Password:" + users.getPassWord() + "\n");
 				sb.append("Please do not share your login ID or password to anyone.\n");
 				sb.append("\n\tNOTE: This is a system generated email. Please do not reply.");
-				new EmailSend().emailSend(em, "Gannon Auction Shop – Forgot Password Request.", sb.toString(), users.getEmail());
+				new EmailSend().emailSend(em, "Gannon Auction Shop – Forgot Password Request.", sb.toString(),
+						users.getEmail());
 				em.getTransaction().commit();
-				PersistenceManager.closeEntityManagerFactory();
 				SuccessMessagePojo pojo = new SuccessMessagePojo();
 				pojo.setMessage("Password successfully sent to registered email.");
 				pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -51,6 +52,8 @@ public class ForgotPasswordService {
 			pojo3.setStatus("failure");
 			pojo3.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok(pojo3).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

@@ -32,6 +32,16 @@ public class Users implements Serializable {
 	private boolean fAdmin;
 	private String studentId;
 	private String token;
+	private String denyReason;
+	
+	@Column(name = "Deny_reason")
+	public String getDenyReason() {
+		return denyReason;
+	}
+
+	public void setDenyReason(String denyReason) {
+		this.denyReason = denyReason;
+	}
 
 	@Column(name = "token_id")
 	public String getToken() {

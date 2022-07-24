@@ -28,8 +28,9 @@ public class ApprovedUsersService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response list(userListRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<Users> list = new ArrayList<>(0);
@@ -40,7 +41,7 @@ public class ApprovedUsersService {
 				list = em.createQuery(
 						"from Users where fActive is  null and fAdmin=0 and (firstName like :sea or lastName like :sea or email like :sea or studentId like :sea) "
 								+ " order by registeredDate desc")
-						.setParameter("sea", "%" + input.getSearchValue() +"%"  ).getResultList();
+						.setParameter("sea", "%" + input.getSearchValue() + "%").getResultList();
 			}
 			final List<ApprovedUserListResponse> pojoList = new ArrayList<ApprovedUserListResponse>(0);
 			for (final Users reg : list) {
@@ -54,7 +55,6 @@ public class ApprovedUsersService {
 				pojoList.add(p);
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			final SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage((Object) pojoList);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -67,6 +67,8 @@ public class ApprovedUsersService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -75,12 +77,14 @@ public class ApprovedUsersService {
 	@Produces({ "application/json" })
 	@Consumes({ "application/json" })
 	public Response save(final ApprovedUserSaveRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			final Users reg = em.find(Users.class, input.getRegistrationId());
 			reg.setfActive(input.getApproved());
+			reg.setDenyReason(input.getDenyReason());
 			if (input.getApproved().equalsIgnoreCase("Y")) {
 				reg.setActivatedDate(new Date());
 				reg.setActivatedUser(input.getUserId());
@@ -100,7 +104,6 @@ public class ApprovedUsersService {
 			}
 			em.merge((Object) reg);
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			final SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage((Object) "Successfully Saved and user details sent to user");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -113,6 +116,8 @@ public class ApprovedUsersService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }

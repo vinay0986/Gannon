@@ -50,9 +50,10 @@ public class AuctionOrDonationService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response save(final auctionOrDonationServiceRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
 			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			final Users reg = (Users) em.find(Users.class, (Object) input.getUserId());
@@ -159,7 +160,6 @@ public class AuctionOrDonationService {
 				message = "Successfully saved the donation details";
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(message);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -172,6 +172,8 @@ public class AuctionOrDonationService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -180,6 +182,7 @@ public class AuctionOrDonationService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response uploadFiles2(MultipartFormDataInput input) {
+
 		try {
 			Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 			List<InputPart> inputParts = uploadForm.get("files");
@@ -265,8 +268,9 @@ public class AuctionOrDonationService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response list(final AuctionOrDonationListServiceReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			Users user = em.find(Users.class, input.getUserId());
@@ -341,7 +345,6 @@ public class AuctionOrDonationService {
 
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(results);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -354,6 +357,8 @@ public class AuctionOrDonationService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -362,9 +367,10 @@ public class AuctionOrDonationService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response history(final AuctionDonationDetailsRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<AuctionDetailsHistoryRes> results = new ArrayList<>(0);
@@ -374,13 +380,13 @@ public class AuctionOrDonationService {
 					.setParameter("id", input.getAuctionId()).getResultList();
 			for (AuctionTransactionHistory his : history) {
 				AuctionDetailsHistoryRes res = new AuctionDetailsHistoryRes();
-				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + his.getAictionUser().getLastName());
+				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + (his.getAictionUser().getLastName()!=null?his.getAictionUser().getLastName():""));
 				res.setAuctionAmount((int) his.getAuctionAmount());
 				res.setAuctionDate(sdf.format(his.getAuctionPriceChangeDate()));
+				res.setEmail(his.getAictionUser().getEmail());
 				results.add(res);
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(results);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -393,6 +399,8 @@ public class AuctionOrDonationService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -401,9 +409,10 @@ public class AuctionOrDonationService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response details(final AuctionDonationDetailsRequest input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			AuctionDonationDetailsResponse res = new AuctionDonationDetailsResponse();
@@ -445,7 +454,6 @@ public class AuctionOrDonationService {
 				res.setImagesList(images);
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(res);
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -460,6 +468,8 @@ public class AuctionOrDonationService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 
@@ -468,13 +478,16 @@ public class AuctionOrDonationService {
 	@Consumes({ "application/json" })
 	@POST
 	public Response update(final AuctionDonationUpdateReq input) {
+		PersistenceManager manager = new PersistenceManager();
 		try {
-			final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			if (input.getAuctionOrDonation().equalsIgnoreCase("auction")) {
 				AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
+
+				String oldStatus = at.getAuctionStatus();
 
 				if (at.isClosedByAdmin()) {
 					ErrorMessagePojo pojo2 = new ErrorMessagePojo();
@@ -500,6 +513,28 @@ public class AuctionOrDonationService {
 					}
 				}
 
+				if (!oldStatus.equalsIgnoreCase(input.getAuctionStatus())) {
+					if (input.getAuctionStatus().equalsIgnoreCase("OPEN")) {
+						// Push Notification Code
+						List<String> tokenList = em.createQuery(
+								"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+								.getResultList();
+						FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+						fcm.sendPushNotificationToMultiple(tokenList, "Auction Opened", input.getProductName(), null);
+
+						// App level notification code
+						// Application Level notifications code
+						Notifications notification = new Notifications();
+						notification.setAuctionTransaction(at);
+						notification.setCreatedBy(at.getAuctionCreatedBy().getUserId());
+						notification.setCreatedDate(new Date());
+						notification.setDonationTransaction(null);
+						notification.setImageUrl(null);
+						notification.setMessage("Auction Reopned \n" + input.getProductName());
+						em.persist(notification);
+					}
+				}
+
 			} else {
 				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
 				if (at.isClosedByAdmin()) {
@@ -509,6 +544,8 @@ public class AuctionOrDonationService {
 					pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 					return Response.ok((Object) pojo2).build();
 				}
+
+				String oldStatus = at.getDonationProductStatus();
 
 				at.setProductName(input.getProductName());
 				at.setProductDescription(input.getProductDescription());
@@ -526,9 +563,29 @@ public class AuctionOrDonationService {
 					}
 				}
 
+				if (!oldStatus.equalsIgnoreCase(at.getDonationProductStatus())) {
+					if (at.getDonationProductStatus().equalsIgnoreCase("OPEN")) {
+						List<String> tokenList = em.createQuery(
+								"select distinct(token) from Users where fActive='Y' and token is not null and fAdmin=0")
+								.getResultList();
+						FirebseCloudMessagingClass fcm = new FirebseCloudMessagingClass();
+						fcm.sendPushNotificationToMultiple(tokenList, "Donation Opened", input.getProductName(), null);
+
+						// App level notification code
+						// Application Level notifications code
+						Notifications notification = new Notifications();
+						notification.setAuctionTransaction(null);
+						notification.setCreatedBy(at.getDonationCreatedBy().getUserId());
+						notification.setCreatedDate(new Date());
+						notification.setDonationTransaction(at);
+						notification.setImageUrl(null);
+						notification.setMessage("Auction Reopned \n" + input.getProductName());
+						em.persist(notification);
+					}
+				}
+
 			}
 			em.getTransaction().commit();
-			PersistenceManager.closeEntityManagerFactory();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage("Successfully Updated the details");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
@@ -543,6 +600,8 @@ public class AuctionOrDonationService {
 			pojo2.setStatus("failure");
 			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
 			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
 		}
 	}
 }
@@ -551,6 +610,15 @@ class AuctionDetailsHistoryRes {
 	private String auctionUser;
 	private String auctionDate;
 	private int auctionAmount;
+	private String email;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 	public String getAuctionUser() {
 		return auctionUser;

@@ -6,6 +6,15 @@ class ApprovedUserSaveRequest
     private int registrationId;
     private String approved;
     private int userId;
+    private String denyReason;
+
+	public String getDenyReason() {
+		return denyReason;
+	}
+
+	public void setDenyReason(String denyReason) {
+		this.denyReason = denyReason;
+	}
     
     public int getUserId() {
         return this.userId;
