@@ -254,7 +254,7 @@ public class AllAuctionDonationsService {
 
 			final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			AuctionTransaction at = em.find(AuctionTransaction.class, input.getAuctionId());
-			if (input.getAuctionAmount() < at.getAuctionAmount()) {
+			if (input.getAuctionAmount() <= at.getAuctionAmount()) {
 				ErrorMessagePojo pojo2 = new ErrorMessagePojo();
 				pojo2.setError("Auction amount should be greather than the current auction amount");
 				pojo2.setStatus("failure");

@@ -33,7 +33,17 @@ public class Users implements Serializable {
 	private String studentId;
 	private String token;
 	private String denyReason;
+	private boolean notificationRead;
 	
+	@Column(name="notification_read")
+	public boolean isNotificationRead() {
+		return notificationRead;
+	}
+
+	public void setNotificationRead(boolean notificationRead) {
+		this.notificationRead = notificationRead;
+	}
+
 	@Column(name = "Deny_reason")
 	public String getDenyReason() {
 		return denyReason;

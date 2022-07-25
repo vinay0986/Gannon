@@ -88,13 +88,19 @@ public class NotificationsService {
 			List<NotificationServiceListResponse> pojoList = new ArrayList<>(0);
 			for (Notifications n : list) {
 				NotificationServiceListResponse res = new NotificationServiceListResponse();
+				boolean b = true;
 				if (n.getAuctionTransaction() != null) {
 					res.setAuctionId(n.getAuctionTransaction().getAuctionTransactionId());
 					res.setAuctionOrDonation("AUCTION");
+					if (n.getAuctionTransaction().getAuctionStatus().equalsIgnoreCase("CLOSED")) {
+						b = false;
+					}
 				}
 				if (n.getDonationTransaction() != null) {
 					res.setDonationId(n.getDonationTransaction().getDonationTransactionId());
 					res.setAuctionOrDonation("DONATION");
+					if (n.getDonationTransaction().getDonationProductStatus().equalsIgnoreCase("CLOSED"))
+						b = false;
 				}
 				res.setMessage(n.getMessage());
 				res.setImageUrl(n.getImageUrl());
@@ -102,7 +108,8 @@ public class NotificationsService {
 					res.setStatus("UNREAD");
 				else
 					res.setStatus("READ");
-				pojoList.add(res);
+				if (b)
+					pojoList.add(res);
 			}
 
 			em.getTransaction().commit();
