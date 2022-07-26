@@ -85,6 +85,7 @@ public class UsernotificationsService {
 					res.setStatus("UNREAD");
 				else
 					res.setStatus("READ");
+				res.setRegisterId(n.getUserId());
 				pojoList.add(res);
 			}
 
