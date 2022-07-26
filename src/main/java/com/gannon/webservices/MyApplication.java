@@ -24,6 +24,8 @@ public class MyApplication extends Application {
 		this.singletons.add(new UsersListDropDownService());
 		this.singletons.add(new ProductNamesDropDownService());
 		this.singletons.add(new NotificationsService());
+		this.singletons.add(new UsernotificationsService());
+		
 	}
 
 	@Override

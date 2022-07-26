@@ -35,7 +35,7 @@ public class UsernotificationsService {
 
 			Long count = (Long) em
 					.createQuery("select count(*) from Users where fActive is null and notificationRead=0 ")
-					.setParameter("uid", input.getUserId()).getSingleResult();
+					.getSingleResult();
 			if (count == null) {
 				count = 0L;
 			}
@@ -70,7 +70,7 @@ public class UsernotificationsService {
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
 			List<Users> list = em.createQuery("from Users where fActive is null order by userId desc")
-					.setParameter("uid", input.getUserId()).getResultList();
+					.getResultList();
 
 			List<UserNotificationDetailsResponse> pojoList = new ArrayList<>(0);
 			for (Users n : list) {
@@ -123,7 +123,7 @@ public class UsernotificationsService {
 
 			Long count = (Long) em
 					.createQuery("select count(*) from Users where fActive is null and notificationRead=0 ")
-					.setParameter("uid", input.getRegisterId()).getSingleResult();
+					.getSingleResult();
 			if (count == null) {
 				count = 0L;
 			}
