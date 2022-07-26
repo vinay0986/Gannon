@@ -31,15 +31,19 @@ public class NotificationsService {
 			final EntityManagerFactory emf = manager.getEntityManagerFactory();
 			final EntityManager em = emf.createEntityManager();
 			em.getTransaction().begin();
-			Long count = (Long) em.createQuery(
-					"select count(*) from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from"
-							+ " NotificationsHistory where readby=:uid) ")
-					.setParameter("uid", input.getUserId()).getSingleResult();
-			if (count == null) {
-				count = 0L;
-			}
+
+			List<Notifications> auList = em.createQuery(
+					"from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from "
+							+ " NotificationsHistory where readby=:uid) and auctionTransaction is not null and auctionTransaction.auctionStatus='OPEN'")
+					.setParameter("uid", input.getUserId()).getResultList();
+			List<Notifications> donList = em.createQuery(
+					"from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from "
+							+ " NotificationsHistory where readby=:uid) and donationTransaction is not null and donationTransaction.donationProductStatus='OPEN'")
+					.setParameter("uid", input.getUserId()).getResultList();
+
+			int count = auList.size() + donList.size();
 			NotificationServiceCountResponse response = new NotificationServiceCountResponse();
-			response.setCount(count.intValue());
+			response.setCount(count);
 			em.getTransaction().commit();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(response);
@@ -156,15 +160,18 @@ public class NotificationsService {
 			his.setReadDate(new Date());
 			em.persist(his);
 
-			Long count = (Long) em.createQuery(
-					"select count(*) from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from"
-							+ " NotificationsHistory where readby=:uid) ")
-					.setParameter("uid", input.getUserId()).getSingleResult();
-			if (count == null) {
-				count = 0L;
-			}
+			List<Notifications> auList = em.createQuery(
+					"from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from "
+							+ " NotificationsHistory where readby=:uid) and auctionTransaction is not null and auctionTransaction.auctionStatus='OPEN'")
+					.setParameter("uid", input.getUserId()).getResultList();
+			List<Notifications> donList = em.createQuery(
+					"from Notifications where createdBy!=:uid and notificationsId not in (select notifications.notificationsId from "
+							+ " NotificationsHistory where readby=:uid) and donationTransaction is not null and donationTransaction.donationProductStatus='OPEN'")
+					.setParameter("uid", input.getUserId()).getResultList();
+
+			int count = auList.size() + donList.size();
 			NotificationServiceCountResponse response = new NotificationServiceCountResponse();
-			response.setCount(count.intValue());
+			response.setCount(count);
 
 			em.getTransaction().commit();
 
