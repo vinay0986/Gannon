@@ -37,6 +37,7 @@ public class RegistrationService {
 			}
 			String arr[] = input.getEmail().split("@");
 			if (arr.length == 1) {
+				em.getTransaction().commit();
 				ErrorMessagePojo pojo = new ErrorMessagePojo();
 				pojo.setError("Invalid email format");
 				pojo.setStatus("failure");
@@ -45,6 +46,7 @@ public class RegistrationService {
 			}
 			if (settings != null && settings.getValue() != null && !settings.getValue().equalsIgnoreCase("")) {
 				if (!arr[1].equalsIgnoreCase(settings.getValue())) {
+					em.getTransaction().commit();
 					ErrorMessagePojo pojo = new ErrorMessagePojo();
 					pojo.setError("Only  " + settings.getValue() + " domain is allowed");
 					pojo.setStatus("failure");
@@ -55,6 +57,7 @@ public class RegistrationService {
 
 			if (!em.createQuery("from Users where email=:em").setParameter("em", input.getEmail()).getResultList()
 					.isEmpty()) {
+				em.getTransaction().commit();
 				ErrorMessagePojo pojo = new ErrorMessagePojo();
 				pojo.setError("Provided Email is already registred");
 				pojo.setStatus("failure");
