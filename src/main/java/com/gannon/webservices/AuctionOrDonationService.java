@@ -60,6 +60,15 @@ public class AuctionOrDonationService {
 			String message = null;
 			String imgUrl = null;
 
+			if (!input.getAuctionOrDonation().equalsIgnoreCase("auction")
+					&& !input.getAuctionOrDonation().equalsIgnoreCase("donation")) {
+				ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+				pojo2.setError("Auction/Donation Value is required");
+				pojo2.setStatus("failure");
+				pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+				return Response.ok((Object) pojo2).build();
+			}
+
 			ConstantSettings settings = null;
 			try {
 				settings = (ConstantSettings) em
@@ -380,7 +389,8 @@ public class AuctionOrDonationService {
 					.setParameter("id", input.getAuctionId()).getResultList();
 			for (AuctionTransactionHistory his : history) {
 				AuctionDetailsHistoryRes res = new AuctionDetailsHistoryRes();
-				res.setAuctionUser(his.getAictionUser().getFirstName() + " " + (his.getAictionUser().getLastName()!=null?his.getAictionUser().getLastName():""));
+				res.setAuctionUser(his.getAictionUser().getFirstName() + " "
+						+ (his.getAictionUser().getLastName() != null ? his.getAictionUser().getLastName() : ""));
 				res.setAuctionAmount((int) his.getAuctionAmount());
 				res.setAuctionDate(sdf.format(his.getAuctionPriceChangeDate()));
 				res.setEmail(his.getAictionUser().getEmail());
