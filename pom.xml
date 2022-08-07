@@ -11,28 +11,17 @@
 		<resteasy.version>3.15.3.Final</resteasy.version>
 	</properties>
 	<dependencies>
-		 <!-- <dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-			<version>5.3.6.Final</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>c3p0</artifactId>
-					<groupId>c3p0</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency> -->
-		<!--<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5</version>
-		</dependency>
-
+		<!-- Data Exporter -->
 		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5.2</version>
-		</dependency> -->
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -50,6 +39,11 @@
 			<version>2.5.1</version>
 			<scope>provided</scope>
 		</dependency>
+
+
+
+
+
 		<!-- START JSF deps -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -58,12 +52,36 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- Faces Implementation -->
-		<!--<dependency> <groupId>com.sun.faces</groupId> <artifactId>jsf-impl</artifactId> 
-			<version>2.2.4</version> </dependency> Faces Library <dependency> <groupId>com.sun.faces</groupId> 
-			<artifactId>jsf-api</artifactId> <version>2.2.4</version> </dependency> JSP 
-			Library <dependency> <groupId>javax.servlet.jsp</groupId> <artifactId>javax.servlet.jsp-api</artifactId> 
-			<version>2.3.1</version> </dependency> JSTL Library <dependency> <groupId>javax.servlet</groupId> 
-			<artifactId>jstl</artifactId> <version>1.1.2</version> </dependency> -->
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-impl</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+		<!--Faces Library-->
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+		<!--JSP		Library-->
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<!--JSTL Library-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		
+		<!-- Primefaces Version 5 -->
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>8.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>mysql</groupId>

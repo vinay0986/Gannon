@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<style type="text/css">
+#dlg .ui-dialog-content {
+	overflow: hidden;
+}
+</style>
+	<p:dialog id="dlg" widgetVar="statusDialog" modal="true" appendTo="@(body)"
+		draggable="false" closable="false" resizable="false"
+		showHeader="false" position="center center" onShow="PF('statusDialog').initPosition()">
+		<h:graphicImage value="/images/processing.gif" />
+	</p:dialog>
+
+</ui:composition>
+

@@ -1,0 +1,189 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title><ui:insert name="title" /></title>
+	<ui:insert name="head" />
+
+</h:head>
+<h:body style="background:black;">
+	<style>
+.col1 {
+	width: 80%;
+}
+
+.col2 {
+	width: 20%;
+}
+
+.ui-tabs .ui-tabs-nav {
+	margin: 0;
+	background: #97002e;
+}
+
+ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a,
+	.ui-tabs .ui-tabs-nav li.ui-state-processing a {
+	cursor: text;
+	background: #97002e;
+}
+/* .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+    cursor: pointer;
+    background-color: white;
+} */
+.ui-paginator.ui-paginator-top {
+	border-bottom: 0 none;
+	background: black;
+	color: white;
+}
+
+.ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-next,
+	.ui-paginator .ui-paginator-last, .ui-paginator .ui-paginator-first,
+	.ui-paginator .ui-paginator-prev {
+	cursor: pointer;
+	background: #97002e;
+	color: white;
+}
+
+.ui-datatable thead th {
+	background-image: none !important;
+	background: #97002e !important;
+	color: white !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close, .ui-dialog .ui-dialog-titlebar-minimize,
+	.ui-dialog .ui-dialog-titlebar-maximize {
+	float: right;
+	margin: 0;
+	top: 0;
+	padding: 1px;
+	cursor: pointer;
+	background: #97002e;
+	/* color: white; */
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	padding: 0.4em 0.4em 0.4em 1em;
+	position: relative;
+	border: 0;
+	background: black;
+	color: white;
+}
+.ui-tabs .ui-tabs-nav li {
+        background-color: black;
+        border: 1px solid #ffffff !important;
+    }
+
+.ui-tabs.ui-tabs-top .ui-tabs-nav li.ui-tabs-selected {
+    border-bottom: 0;
+    background: #97002e;
+ }
+ 
+ .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+    cursor: pointer;
+    color: white;
+}
+
+/* .ui-tabs .ui-tabs-panel {
+    border-width: 0;
+    padding: 1em 1.4em;
+    background: 0;
+    background-color: white;
+}
+
+.ui-panel .ui-panel-content {
+	border: 0;
+	background: 0;
+	/* padding: .5em 1em; */
+}
+* /
+	/* .ui-dialog .ui-dialog-titlebar {
+	padding: 0.4em 0.4em 0.4em 1em;
+	position: relative;
+	border: 0;
+	background-color: black;
+	color: white;
+}
+
+.ui-widget-header {
+	border: 1px solid black;
+	background-color:black;
+	color: white;
+	font-weight: bold;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+} */
+	/* .ui-inputfield {
+    margin: 0;
+    outline: medium none;
+    padding: 2px;
+    font-weight: normal;
+    font-size:14px !important;
+}
+.ui-widget .ui-widget {
+    font-size: 14px;
+}
+.ui-datepicker-trigger.ui-button-icon-only .ui-button-text {
+    padding: 2px;
+} */
+	/* .ui-state-default, .ui-state-default, .ui-widget-header .ui-state-default
+	{
+	background: #97002e;
+	color: white;
+} */ 
+
+.companyStyle {
+	text-align: left;
+	font-size: 20px;
+	font-weight: bold;
+	color: #b511a8;
+	/* font-size: 1.5rem; */
+	/* color: red; */
+	font-family: verdana, Arial, sans-serif;
+}
+</style>
+
+	<div class="ui-g ui-fluid"
+		style="height: 100px; padding: 2px; margin-top: -25px;">
+		<div class="ui-g-12 ui-lg-12">
+			<p:panelGrid columns="3" layout="grid"
+				styleClass="ui-panelgrid-blank form-group">
+
+				<p:panelGrid layout="grid" columns="1">
+					<h:graphicImage value="/images/MainLogo.png" width="67%" />
+				</p:panelGrid>
+				<p:panelGrid layout="grid" columns="1" style="text-align:center;padding:30px;">
+					<h:outputText
+						value="Welcome #{loginAction.user.firstName} #{loginAction.user.lastName}"
+						style="font-size: 20px;font-weight: bold;color: white;font-family: verdana, Arial, sans-serif;" />
+				</p:panelGrid>
+				<p:panelGrid layout="grid" columns="1" style="text-align:right;;padding:30px;">
+					<h:form>
+						<p:commandButton action="#{loginAction.logout}" id="logout"
+							style="width:40%;background: #97002e;color: white;"
+							value="Log out">
+							<p:confirm header="Log Out ?"
+								message="Are you sure want to log out ?" />
+						</p:commandButton>
+					</h:form>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							style="background:#97002e;color:white"
+							styleClass="ui-confirmdialog-yes" />
+						<p:commandButton value="No" type="button"
+							style="background:black;color:white"
+							styleClass="ui-confirmdialog-no" />
+					</p:confirmDialog>
+				</p:panelGrid>
+
+			</p:panelGrid>
+		</div>
+	</div>
+	<ui:insert name="body" />
+	<p:growl id="growl" showDetail="false" sticky="false"
+		showSummary="true" autoUpdate="true" life="10000" />
+	<ui:include src="progresspanel.xhtml" />
+</h:body>
+</html>

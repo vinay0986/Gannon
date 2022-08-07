@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/pages/default.xhtml">
+	<ui:define name="title">Customer Creation</ui:define>
+	<ui:define name="body">
+		<h:form prependId="false">
+			<f:metadata>
+				<f:viewAction action="#{userAction.pageEnter()}"></f:viewAction>
+			</f:metadata>
+			<p:tabView>
+				<p:tab title="Newly Registered" titleStyle="color:white">
+
+					<p:outputPanel id="table1">
+						<h:outputText value="No Newly Registered users information"
+							rendered="#{userAction.newlyRegisteredList.size()==0}" />
+						<p:dataTable value="#{userAction.newlyRegisteredList}" var="_cus"
+							scrollable="true" paginatorPosition="top"
+							widgetVar="w_customertable"
+							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+							paginator="true" rows="30" id="customertable" reflow="true"
+							rowKey="#{_cus.userId}" selectionMode="single"
+							rendered="#{userAction.newlyRegisteredList.size()>0}">
+
+							<p:column headerText="First Name" filterMatchMode="contains"
+								sortBy="#{_cus.firstName}" filterBy="#{_cus.firstName}">
+								<h:outputText value="#{_cus.firstName}" />
+							</p:column>
+							<p:column headerText="Last Name" filterMatchMode="contains"
+								sortBy="#{_cus.lastName}" filterBy="#{_cus.lastName}">
+								<h:outputText value="#{_cus.lastName}" />
+							</p:column>
+							<p:column headerText="Email" filterMatchMode="contains"
+								sortBy="#{_cus.email}" filterBy="#{_cus.email}">
+								<h:outputText value="#{_cus.email}" />
+							</p:column>
+							<p:column headerText="Student Id" filterMatchMode="contains"
+								sortBy="#{_cus.studentId}" filterBy="#{_cus.studentId}">
+								<h:outputText value="#{_cus.studentId}" />
+							</p:column>
+							<p:column headerText="Deny Reason">
+								<p:inputTextarea value="#{_cus.denyReason}" cols="21" rows="2"
+									autoResize="false" />
+							</p:column>
+							<p:column>
+
+
+								<p:commandButton action="#{userAction.approve1(_cus)}"
+									value="Approve"
+									
+									update="customertable" process="@form"
+									style="width: 100px;margin: 0 auto;display: inline;background: green;color: white;"></p:commandButton>
+
+								<p:spacer width="5px" />
+
+								<p:commandButton
+									
+									update="customertable" value="Deny"
+									action="#{userAction.deny1(_cus)}" process="@form"
+									style="width: 70px; margin: 0 auto; display: inline;background: #97002e;color: white;"></p:commandButton>
+							</p:column>
+
+						</p:dataTable>
+					</p:outputPanel>
+				</p:tab>
+				<p:tab title="Registered Users">
+
+					<p:outputPanel id="table2">
+						<h:outputText value="No Newly Registered users information"
+							rendered="#{userAction.exisitingUsersList.size()==0}" />
+						<p:dataTable value="#{userAction.exisitingUsersList}" var="_cus1"
+							scrollable="true" paginatorPosition="top"
+							widgetVar="w_customertable1"
+							currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+							paginator="true" rows="30" id="customertable1" reflow="true"
+							rowKey="#{_cus1.userId}" selectionMode="single"
+							rendered="#{userAction.exisitingUsersList.size()>0}">
+
+							<p:column headerText="First Name" filterMatchMode="contains"
+								sortBy="#{_cus1.firstName}" filterBy="#{_cus1.firstName}">
+								<h:outputText value="#{_cus1.firstName}" />
+							</p:column>
+							<p:column headerText="Last Name" filterMatchMode="contains"
+								sortBy="#{_cus1.lastName}" filterBy="#{_cus1.lastName}">
+								<h:outputText value="#{_cus1.lastName}" />
+							</p:column>
+							<p:column headerText="Email" filterMatchMode="contains"
+								sortBy="#{_cus1.email}" filterBy="#{_cus1.email}">
+								<h:outputText value="#{_cus1.email}" />
+							</p:column>
+							<p:column headerText="Student Id" filterMatchMode="contains"
+								sortBy="#{_cus1.studentId}" filterBy="#{_cus1.studentId}">
+								<h:outputText value="#{_cus1.studentId}" />
+							</p:column>
+							<p:column headerText="Deny Reason">
+								<h:outputText value="#{_cus1.denyReason}" />
+							</p:column>
+							<p:column>
+								<p:commandButton value="Approve"
+									rendered="#{_cus1.fActive eq 'N'}"
+									style="background: green;color: white;"
+									action="#{userAction.approveOrDeny(_cus1,'Y')}"
+									update="customertable1" process="@form">
+								</p:commandButton>
+
+								<p:commandButton rendered="#{_cus1.fActive eq 'Y'}"
+									style="background: #97002e;color: white;"
+									update="customertable1" value="Deny"
+									action="#{userAction.approveOrDeny(_cus1,'N')}" process="@form">
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:outputPanel>
+				</p:tab>
+
+			</p:tabView>
+		</h:form>
+	</ui:define>
+</ui:composition>
