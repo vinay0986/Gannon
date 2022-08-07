@@ -440,11 +440,15 @@ public class AuctionOrDonationService {
 				res.setAuctionStatus(at.getAuctionStatus());
 				res.setInitialAmount((int) at.getInitialAuctionAmount());
 				res.setProductDescription(at.getProductDescription());
-				List<String> images = new ArrayList<>(0);
+				List<ImageDetails> images = new ArrayList<>(0);
 				for (ProductImage img : imgList) {
-					images.add("img/" + img.getImagePath());
+					ImageDetails imgDe = new ImageDetails();
+					imgDe.setId(img.getProductImageId());
+					imgDe.setUrl("img/" + img.getImagePath());
+					images.add(imgDe);
 				}
 				res.setImagesList(images);
+
 			} else {
 				DonationTransaction at = em.find(DonationTransaction.class, input.getDonationId());
 
@@ -457,15 +461,53 @@ public class AuctionOrDonationService {
 				res.setAuctionCloseDate(sdf.format(at.getDonationCloseDate()));
 				res.setAuctionStatus(at.getDonationProductStatus());
 				res.setProductDescription(at.getProductDescription());
-				List<String> images = new ArrayList<>(0);
+				List<ImageDetails> images = new ArrayList<>(0);
 				for (ProductImage img : imgList) {
-					images.add("img/" + img.getImagePath());
+					ImageDetails imgDe = new ImageDetails();
+					imgDe.setId(img.getProductImageId());
+					imgDe.setUrl("img/" + img.getImagePath());
+					images.add(imgDe);
 				}
 				res.setImagesList(images);
 			}
 			em.getTransaction().commit();
 			SuccessMessagePojo pojo = new SuccessMessagePojo();
 			pojo.setMessage(res);
+			pojo.setStatusCode(Response.Status.OK.getStatusCode());
+			pojo.setStatus("Success");
+			return Response.ok((Object) pojo).build();
+		} catch (
+
+		Exception e) {
+			e.printStackTrace();
+			final ErrorMessagePojo pojo2 = new ErrorMessagePojo();
+			pojo2.setError("Unable to process the request");
+			pojo2.setStatus("failure");
+			pojo2.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+			return Response.ok((Object) pojo2).build();
+		} finally {
+			manager.closeEntityManagerFactory();
+		}
+	}
+
+	@Path("/delete")
+	@Produces({ "application/json" })
+	@Consumes({ "application/json" })
+	@POST
+	public Response delete(final ImageDetailsRequest input) {
+		PersistenceManager manager = new PersistenceManager();
+		try {
+			final EntityManagerFactory emf = manager.getEntityManagerFactory();
+			final EntityManager em = emf.createEntityManager();
+			em.getTransaction().begin();
+
+			ProductImage img = em.find(ProductImage.class, input.getImageId());
+
+			em.remove(img);
+
+			em.getTransaction().commit();
+			SuccessMessagePojo pojo = new SuccessMessagePojo();
+			pojo.setMessage("Successfully deleted");
 			pojo.setStatusCode(Response.Status.OK.getStatusCode());
 			pojo.setStatus("Success");
 			return Response.ok((Object) pojo).build();
@@ -739,7 +781,7 @@ class AuctionDonationDetailsResponse {
 	private String auctionStatus;
 	private int auctionAmount;
 	private int initialAmount;
-	private List<String> imagesList = new ArrayList<>(0);
+	private List<ImageDetails> imagesList = new ArrayList<>(0);
 
 	public int getInitialAmount() {
 		return initialAmount;
@@ -749,11 +791,11 @@ class AuctionDonationDetailsResponse {
 		this.initialAmount = initialAmount;
 	}
 
-	public List<String> getImagesList() {
+	public List<ImageDetails> getImagesList() {
 		return imagesList;
 	}
 
-	public void setImagesList(List<String> imagesList) {
+	public void setImagesList(List<ImageDetails> imagesList) {
 		this.imagesList = imagesList;
 	}
 
@@ -876,6 +918,41 @@ class AuctionDOnationListServiceRes {
 	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;
 	}
+}
+
+class ImageDetailsRequest {
+	private int imageId;
+
+	public int getImageId() {
+		return imageId;
+	}
+
+	public void setImageId(int imageId) {
+		this.imageId = imageId;
+	}
+
+}
+
+class ImageDetails {
+	private Integer id;
+	private String url;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }
 
 class AuctionOrDonationListServiceReq {
